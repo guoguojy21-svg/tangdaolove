@@ -51,6 +51,16 @@ const REPLACE_RULES = [
   { from: /(["'(])\/community\.html/g, to: `$1${BASE_PATH}/community.html` },
   { from: /(["'(])\/community-detail\.html/g, to: `$1${BASE_PATH}/community-detail.html` },
   { from: /(["'(])\/collection\.html/g, to: `$1${BASE_PATH}/collection.html` },
+  // Clean URL 导航链接（不带 .html，如 href="/community"）
+  { from: /(["'(])\/community(?![./])/g, to: `$1${BASE_PATH}/community` },
+  { from: /(["'(])\/collection(?![./])/g, to: `$1${BASE_PATH}/collection` },
+  { from: /(["'(])\/now(?![./])/g, to: `$1${BASE_PATH}/now` },
+  { from: /(["'(])\/map(?![./])/g, to: `$1${BASE_PATH}/map` },
+  { from: /(["'(])\/today(?![./])/g, to: `$1${BASE_PATH}/today` },
+  // Clean URL 动态路由（如 /now/123、/community/456）
+  { from: /(["'(])\/community\//g, to: `$1${BASE_PATH}/community/` },
+  { from: /(["'(])\/collection\//g, to: `$1${BASE_PATH}/collection/` },
+  { from: /(["'(])\/now\//g, to: `$1${BASE_PATH}/now/` },
 ];
 
 function applyPathReplace(content) {
