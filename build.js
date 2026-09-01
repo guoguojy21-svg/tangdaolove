@@ -31,8 +31,8 @@ if (fs.existsSync(envLocalPath)) {
 const AMAP_KEY = process.env.AMAP_KEY || "__AMAP_KEY__";
 const AMAP_SECURITY_JS_CODE = process.env.AMAP_SECURITY_JS_CODE || "__AMAP_SECURITY_JS_CODE__";
 
-// GitHub Pages 仓库名（base 路径）
-const BASE_PATH = "/tangdao";
+// GitHub Pages 仓库名（base 路径，必须与 GitHub 仓库名一致）
+const BASE_PATH = "/tangdaolove";
 
 // ============================================================
 // 2. 构建路径替换规则（仅替换根路径资源，不影响 CDN）
