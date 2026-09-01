@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="200" height="200">
+  <!-- TODO: 月光贝 MOON SHELL 正式贝壳素材将由设计替换，当前为优雅矢量占位轮廓 -->
+  <defs>
+    <radialGradient id="moonGrad" cx="42%" cy="35%" r="70%">
+      <stop offset="0%" stop-color="#F6F2FA"/>
+      <stop offset="100%" stop-color="#E8E0ED"/>
+    </radialGradient>
+  </defs>
+  <path d="M100 28 C 58 28, 28 70, 28 112 C 28 152, 58 176, 100 176 C 142 176, 172 152, 172 112 C 172 70, 142 28, 100 28 Z" fill="url(#moonGrad)" stroke="#B8A8C8" stroke-width="1.4"/>
+  <g stroke="#C8B8D8" stroke-width="0.7" fill="none" opacity="0.55">
+    <path d="M100 42 L100 162"/>
+    <path d="M68 54 Q100 78, 132 54"/>
+    <path d="M48 80 Q100 120, 152 80"/>
+    <path d="M38 110 Q100 158, 162 110"/>
+  </g>
+  <path d="M74 48 Q62 92, 80 132" stroke="#FFFFFF" stroke-width="3.2" fill="none" opacity="0.55" stroke-linecap="round"/>
+  <circle cx="100" cy="105" r="3.5" fill="#FFFFFF" opacity="0.6"/>
+</svg>

@@ -1,0 +1,897 @@
+/* ============================================
+   躺岛 TANGDAO · 地图页面样式
+   克制暖米色 / 木色 / 深绿色 临时视觉
+   ============================================ */
+
+.map-page {
+  height: 100vh;
+  overflow: hidden;
+  background: var(--sand-50);
+  display: flex;
+  flex-direction: column;
+}
+
+/* ============ 顶部品牌栏（旧 .map-header 已废弃，导航由 .map-nav 承载） ============ */
+#liveClock {
+  font-family: var(--serif-en);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.05em;
+  color: var(--wood-700);
+  font-weight: 500;
+}
+
+/* ============ 分类筛选栏 ============ */
+.filter-bar {
+  position: relative;
+  z-index: 90;
+  background: rgba(249, 240, 226, 0.9);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border-bottom: 1px solid var(--wood-200);
+  padding: 0.7rem 0;
+}
+.filter-bar__scroll {
+  width: min(94%, 1280px);
+  margin-inline: auto;
+  display: flex;
+  gap: 0.6rem;
+  overflow-x: auto;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  padding: 0.2rem 0;
+}
+.filter-bar__scroll::-webkit-scrollbar { display: none; }
+
+.filter-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  flex-shrink: 0;
+  padding: 0.4rem 0.9rem 0.4rem 0.7rem;
+  background: var(--sand-50);
+  border: 1px solid var(--wood-200);
+  border-radius: 20px;
+  font-size: 0.82rem;
+  color: var(--text-mid);
+  cursor: pointer;
+  transition: all 0.25s ease;
+  font-family: var(--sans);
+  letter-spacing: 0.03em;
+}
+.filter-chip__dot {
+  width: 9px; height: 9px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  transition: transform 0.25s;
+}
+.filter-chip em {
+  font-style: normal;
+  font-size: 0.72rem;
+  color: var(--text-light);
+  background: var(--sand-200);
+  border-radius: 10px;
+  padding: 0.05rem 0.45rem;
+  min-width: 18px;
+  text-align: center;
+}
+.filter-chip:hover {
+  border-color: var(--wood-400);
+  color: var(--text-dark);
+}
+.filter-chip.is-active {
+  background: var(--wood-700);
+  border-color: var(--wood-700);
+  color: var(--sand-50);
+}
+.filter-chip.is-active em {
+  background: rgba(253, 248, 240, 0.2);
+  color: var(--sand-50);
+}
+.filter-chip.is-active .filter-chip__dot { transform: scale(1.25); }
+
+/* ============ 地图舞台 ============ */
+.map-stage {
+  flex: 1;
+  position: relative;
+  min-height: 0;
+}
+.map-container {
+  position: absolute;
+  inset: 0;
+  background: var(--sand-100);
+}
+
+/* 隐藏高德默认 logo/版权的拥挤感，但保留版权合规 */
+.amap-logo { opacity: 0.6; }
+.amap-copyright { opacity: 0.5; font-size: 10px !important; }
+
+/* 自定义 marker（定位由高德 anchor:bottom-center 控制，CSS 不再做位移） */
+.tangdao-marker {
+  position: relative;
+  width: 30px; height: 30px;
+  cursor: pointer;
+  transition: transform 0.25s ease;
+}
+.tangdao-marker__pin {
+  width: 30px; height: 30px;
+  border-radius: 50% 50% 50% 0;
+  transform: rotate(-45deg);
+  border: 2px solid #fff;
+  box-shadow: 0 3px 10px rgba(58, 46, 34, 0.3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: box-shadow 0.25s;
+}
+/* 旧 .tangdao-marker__pin span 规则已移除：现统一由 .tangdao-marker__icon 处理 SVG 图标 */
+.tangdao-marker__label {
+  position: absolute;
+  bottom: 100%; left: 50%;
+  transform: translateX(-50%);
+  margin-bottom: 4px;
+  background: rgba(58, 46, 34, 0.85);
+  color: var(--sand-50);
+  font-size: 11px;
+  padding: 0.15rem 0.5rem;
+  border-radius: 3px;
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.25s;
+  font-family: var(--sans);
+  letter-spacing: 0.05em;
+}
+.tangdao-marker:hover { z-index: 10; }
+.tangdao-marker:hover .tangdao-marker__label { opacity: 1; }
+.tangdao-marker.is-active { z-index: 20; }
+.tangdao-marker.is-active .tangdao-marker__pin {
+  box-shadow: 0 0 0 4px rgba(156, 122, 82, 0.3), 0 3px 10px rgba(58, 46, 34, 0.3);
+}
+
+/* ============ 缩放控制 ============ */
+.zoom-control {
+  position: absolute;
+  left: 18px; bottom: 24px;
+  z-index: 50;
+  display: flex;
+  flex-direction: column;
+  background: rgba(253, 248, 240, 0.95);
+  border: 1px solid var(--wood-200);
+  border-radius: 4px;
+  overflow: hidden;
+  box-shadow: var(--shadow-card);
+}
+.zoom-control button {
+  width: 38px; height: 38px;
+  font-size: 1.3rem;
+  color: var(--wood-700);
+  border-bottom: 1px solid var(--wood-200);
+  transition: background 0.2s;
+}
+.zoom-control button:last-child { border-bottom: none; }
+.zoom-control button:hover { background: var(--sand-200); }
+#zoomLevel {
+  text-align: center;
+  font-size: 0.72rem;
+  color: var(--text-light);
+  padding: 0.25rem 0;
+  font-family: var(--serif-en);
+  font-variant-numeric: tabular-nums;
+  border-bottom: 1px solid var(--wood-200);
+}
+
+/* ============ 图例 ============ */
+.map-legend {
+  position: absolute;
+  left: 18px; top: 18px;
+  z-index: 50;
+  background: rgba(253, 248, 240, 0.92);
+  border: 1px solid var(--wood-200);
+  border-radius: 4px;
+  padding: 0.7rem 0.9rem;
+  box-shadow: var(--shadow-card);
+  max-width: 180px;
+}
+.map-legend h4 {
+  font-size: 0.72rem;
+  letter-spacing: 0.15em;
+  color: var(--wood-500);
+  margin-bottom: 0.5rem;
+  font-weight: 500;
+  font-family: var(--sans);
+}
+.legend-row {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  font-size: 0.78rem;
+  color: var(--text-mid);
+  padding: 0.18rem 0;
+}
+.legend-row__dot {
+  width: 10px; height: 10px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+/* ============ 状态提示 ============ */
+.map-status {
+  position: absolute;
+  inset: 0;
+  z-index: 80;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--sand-100);
+  transition: opacity 0.4s;
+}
+.map-status.is-hidden { opacity: 0; pointer-events: none; }
+.map-status__box {
+  text-align: center;
+  color: var(--wood-700);
+}
+.map-status__spinner {
+  display: block;
+  width: 32px; height: 32px;
+  margin: 0 auto 1rem;
+  border: 2px solid var(--wood-200);
+  border-top-color: var(--wood-500);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+.map-status__box p { font-size: 0.9rem; letter-spacing: 0.05em; }
+
+/* ============ 地点信息卡 ============ */
+.poi-card {
+  position: absolute;
+  z-index: 70;
+  top: 18px; right: 18px;
+  bottom: 18px;
+  width: 340px;
+  background: var(--sand-50);
+  border: 1px solid var(--wood-200);
+  border-radius: 6px;
+  box-shadow: var(--shadow-soft);
+  transform: translateX(120%);
+  transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+.poi-card.is-open { transform: translateX(0); }
+.poi-card__close {
+  position: absolute;
+  top: 0.5rem; right: 0.6rem;
+  width: 30px; height: 30px;
+  font-size: 1.4rem;
+  color: var(--wood-500);
+  z-index: 2;
+  line-height: 1;
+  border-radius: 50%;
+  transition: background 0.2s;
+}
+.poi-card__close:hover { background: var(--sand-200); }
+
+.poi-card__inner {
+  padding: 1.6rem 1.5rem 1.5rem;
+  overflow-y: auto;
+  flex: 1;
+}
+.poi-card__inner::-webkit-scrollbar { width: 5px; }
+.poi-card__inner::-webkit-scrollbar-thumb { background: var(--wood-300); border-radius: 3px; }
+
+.poi-card__layer {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.72rem;
+  letter-spacing: 0.1em;
+  color: var(--wood-700);
+  text-transform: uppercase;
+  font-family: var(--serif-en);
+  margin-bottom: 0.6rem;
+}
+.poi-card__layer i {
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  display: inline-block;
+}
+.poi-card__name {
+  font-family: var(--serif-cn);
+  font-weight: 600;
+  font-size: 1.35rem;
+  color: var(--text-dark);
+  line-height: 1.35;
+  margin-bottom: 0.3rem;
+}
+.poi-card__addr {
+  font-size: 0.82rem;
+  color: var(--text-light);
+  line-height: 1.5;
+  margin-bottom: 1rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid var(--wood-200);
+}
+.poi-card__tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin-bottom: 1rem;
+}
+.poi-card__tag {
+  font-size: 0.72rem;
+  color: var(--leaf-700);
+  background: rgba(107, 130, 80, 0.1);
+  border: 1px solid rgba(107, 130, 80, 0.25);
+  border-radius: 12px;
+  padding: 0.15rem 0.6rem;
+}
+.poi-card__section { margin-bottom: 1rem; }
+.poi-card__section h5 {
+  font-size: 0.72rem;
+  letter-spacing: 0.15em;
+  color: var(--wood-500);
+  text-transform: uppercase;
+  margin-bottom: 0.4rem;
+  font-weight: 500;
+  font-family: var(--sans);
+}
+.poi-card__section p,
+.poi-card__section li {
+  font-size: 0.88rem;
+  color: var(--text-mid);
+  line-height: 1.65;
+}
+.poi-card__section ul { list-style: none; }
+.poi-card__section ul li {
+  position: relative;
+  padding-left: 1rem;
+  margin-bottom: 0.25rem;
+}
+.poi-card__section ul li::before {
+  content: "";
+  position: absolute;
+  left: 0; top: 0.6rem;
+  width: 4px; height: 4px;
+  border-radius: 50%;
+  background: var(--wood-400);
+}
+.poi-card__crowd {
+  font-size: 0.84rem;
+  color: var(--text-mid);
+}
+.poi-card__remark {
+  background: var(--sand-200);
+  border-radius: 4px;
+  padding: 0.7rem 0.8rem;
+  font-size: 0.82rem;
+  color: var(--text-mid);
+  line-height: 1.6;
+  border-left: 3px solid var(--wood-400);
+}
+
+/* 「查看正在发生」入口按钮 */
+.poi-card__action {
+  display: block;
+  margin-top: 0.9rem;
+  padding: 0.7rem 1rem;
+  text-align: center;
+  font-size: 0.88rem;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  color: var(--bg-soft);
+  background: var(--wood-500);
+  border-radius: 6px;
+  text-decoration: none;
+  transition: background 0.25s ease, transform 0.25s ease;
+}
+.poi-card__action:hover {
+  background: var(--wood-600, #8a6a3a);
+  transform: translateY(-1px);
+}
+
+/* 收藏地点按钮（接入我的躺岛 store） */
+.poi-card__collect {
+  display: block;
+  width: 100%;
+  margin-top: 0.6rem;
+  padding: 0.6rem 1rem;
+  text-align: center;
+  font-size: 0.84rem;
+  color: var(--wood-600, #6B4F35);
+  background: transparent;
+  border: 1px dashed rgba(107,79,53,0.4);
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+.poi-card__collect:hover {
+  background: rgba(107,79,53,0.06);
+  border-style: solid;
+}
+.poi-card__collect.is-saved {
+  color: #fff;
+  background: var(--wood-500);
+  border-style: solid;
+}
+
+/* 看看别人怎么说 · 相关帖子（按 placeId 聚合） */
+.poi-card__posts {
+  margin-top: 0.9rem;
+  padding-top: 0.7rem;
+  border-top: 1px dashed rgba(156,123,82,0.25);
+}
+.poi-card__posts-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.5rem;
+}
+.poi-card__posts-head span {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--wood-600, #6B4F35);
+}
+.poi-card__posts-more {
+  font-size: 0.72rem;
+  color: var(--wood-500, #8B6A3A);
+  text-decoration: none;
+}
+.poi-card__posts-more:hover { text-decoration: underline; }
+.poi-card__posts-loading,
+.poi-card__posts-empty {
+  font-size: 0.76rem;
+  color: #9AA094;
+  text-align: center;
+  padding: 0.4rem 0;
+  font-style: italic;
+}
+
+/* ============ 配置提示 ============ */
+.config-hint {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  background: var(--sand-50);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 2rem;
+}
+/* 修复 display:flex 覆盖 [hidden] 属性导致隐藏失效 */
+.config-hint[hidden] { display: none; }
+.config-hint h2 {
+  font-family: var(--serif-cn);
+  font-weight: 600;
+  color: var(--text-dark);
+  font-size: 1.5rem;
+  margin-bottom: 0.8rem;
+}
+.config-hint p {
+  color: var(--text-mid);
+  font-size: 0.95rem;
+  margin-bottom: 0.4rem;
+}
+.config-hint code {
+  background: var(--sand-200);
+  padding: 0.1rem 0.4rem;
+  border-radius: 3px;
+  font-size: 0.88rem;
+  color: var(--wood-700);
+}
+.config-hint__sub { font-size: 0.85rem; color: var(--text-light); }
+.config-hint a { color: var(--leaf-700); text-decoration: underline; }
+
+/* ============ 移动端适配 ============ */
+@media (max-width: 768px) {
+  /* 旧 .map-header / #metaWeather / #metaSun 已废弃 */
+
+  .map-legend { max-width: 150px; padding: 0.5rem 0.6rem; }
+  .map-legend h4, .legend-row { font-size: 0.7rem; }
+
+  /* 移动端：底部抽屉式信息卡 */
+  .poi-card {
+    top: auto;
+    left: 0; right: 0; bottom: 0;
+    width: 100%;
+    max-height: 72vh;
+    border-radius: 14px 14px 0 0;
+    transform: translateY(110%);
+    border-left: none;
+    border-right: none;
+    border-bottom: none;
+  }
+  .poi-card.is-open { transform: translateY(0); }
+  .poi-card::before {
+    content: "";
+    position: absolute;
+    top: 0.5rem; left: 50%;
+    transform: translateX(-50%);
+    width: 36px; height: 4px;
+    border-radius: 2px;
+    background: var(--wood-300);
+  }
+  .poi-card__inner { padding: 1.8rem 1.2rem 1.5rem; }
+  .poi-card__name { font-size: 1.2rem; }
+
+  .zoom-control { left: 14px; bottom: 18px; }
+}
+
+/* 减少动画偏好 */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+}
+
+/* ============================================================
+   地图页专属导航（复用 .nav 结构，覆盖 fixed 为文档流）
+   ============================================================ */
+.map-nav {
+  position: relative !important;
+  box-shadow: 0 1px 0 rgba(107, 78, 46, 0.06);
+  padding: 0.75rem 0;
+}
+.map-nav .nav__inner {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+.map-nav__brand {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.1;
+}
+.map-nav__brand .brand__cn {
+  font-size: 1.3rem;
+  letter-spacing: 0.04em;
+}
+.map-nav__brand .brand__en {
+  font-size: 0.68rem;
+  letter-spacing: 0.22em;
+}
+.map-nav__subtitle {
+  font-family: "Ma Shan Zheng", "Noto Serif SC", serif;
+  font-size: 0.95rem;
+  color: var(--wood-500);
+  margin-left: 0.4rem;
+  padding-left: 0.7rem;
+  border-left: 1px solid var(--wood-200);
+}
+
+/* 导航链接激活态（克制） */
+.map-nav .nav__links a {
+  font-size: 0.92rem;
+  padding: 0.3rem 0.1rem;
+}
+.map-nav .nav__links a.is-active {
+  color: var(--wood-600);
+}
+.map-nav .nav__links a.is-active::after {
+  width: 100%;
+  background: var(--wood-500);
+}
+
+/* ============================================================
+   Now in Lingshui 实时状态组件
+   ============================================================ */
+.now-status {
+  margin-left: auto;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.15rem;
+  padding: 0.35rem 0.75rem;
+  border-radius: var(--radius-md);
+  background: rgba(255, 252, 245, 0.55);
+  border: 1px solid rgba(232, 221, 202, 0.6);
+  backdrop-filter: blur(4px);
+  transition: box-shadow var(--transition-base), background var(--transition-base);
+}
+.now-status:hover {
+  background: rgba(255, 252, 245, 0.85);
+  box-shadow: 0 2px 12px rgba(107, 78, 46, 0.08);
+}
+.now-status__eyebrow {
+  font-size: 0.6rem;
+  letter-spacing: 0.28em;
+  color: var(--wood-400);
+  font-weight: 600;
+}
+.now-status__row {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+}
+.now-status__time {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  font-family: "Jost", monospace;
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: var(--wood-700);
+  letter-spacing: 0.02em;
+  font-variant-numeric: tabular-nums;
+}
+.now-status__time svg {
+  width: 16px; height: 16px;
+  color: var(--wood-500);
+}
+
+/* 天气图标区 */
+.now-status__weather {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.15rem 0.5rem;
+  border-radius: 999px;
+  background: rgba(242, 200, 121, 0.12);
+  font-size: 0.8rem;
+  color: var(--wood-600);
+}
+.now-status__weather svg.now-weather__icon {
+  width: 22px; height: 22px;
+  display: block;
+}
+.now-status__temp {
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+.now-status__cond {
+  font-size: 0.72rem;
+  opacity: 0.75;
+}
+
+/* 日落 */
+.now-status__sunset {
+  display: flex;
+  align-items: center;
+  gap: 0.2rem;
+  font-size: 0.72rem;
+  color: var(--wood-500);
+  font-variant-numeric: tabular-nums;
+}
+.now-status__sunset svg {
+  width: 14px; height: 14px;
+}
+
+/* ============================================================
+   天气轻量动画（旅行手账感，克制）
+   ============================================================ */
+/* 晴天：太阳核心呼吸 + 光芒微旋 */
+.now-weather--sun .nw-sun-core {
+  animation: nwSunGlow 4s ease-in-out infinite;
+  transform-origin: center;
+}
+.now-weather--sun .nw-sun-rays {
+  animation: nwSunSpin 24s linear infinite;
+  transform-origin: 12px 12px;
+}
+@keyframes nwSunGlow {
+  0%, 100% { opacity: 0.85; }
+  50% { opacity: 1; }
+}
+@keyframes nwSunSpin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+/* 多云：云朵轻飘 */
+.now-weather--cloud .nw-cloud {
+  animation: nwCloudDrift 6s ease-in-out infinite;
+}
+@keyframes nwCloudDrift {
+  0%, 100% { transform: translateX(0); }
+  50% { transform: translateX(2px); }
+}
+
+/* 小雨：雨滴轻落 */
+.now-weather--rain .nw-rain-drop {
+  animation: nwRainFall 1.6s ease-in infinite;
+}
+.now-weather--rain .nw-rain-drop:nth-child(2) { animation-delay: 0.4s; }
+.now-weather--rain .nw-rain-drop:nth-child(3) { animation-delay: 0.8s; }
+@keyframes nwRainFall {
+  0% { opacity: 0; transform: translateY(-2px); }
+  40% { opacity: 0.7; }
+  100% { opacity: 0; transform: translateY(3px); }
+}
+
+/* 夜晚：星点微闪 + 月亮呼吸 */
+.now-weather--night .nw-star {
+  animation: nwStarTwinkle 3s ease-in-out infinite;
+}
+.now-weather--night .nw-star:nth-child(2) { animation-delay: 1s; }
+.now-weather--night .nw-star:nth-child(3) { animation-delay: 2s; }
+.now-weather--night .nw-moon {
+  animation: nwMoonGlow 5s ease-in-out infinite;
+}
+@keyframes nwStarTwinkle {
+  0%, 100% { opacity: 0.3; }
+  50% { opacity: 1; }
+}
+@keyframes nwMoonGlow {
+  0%, 100% { opacity: 0.9; }
+  50% { opacity: 1; }
+}
+
+/* ============================================================
+   地图容器暖色氛围蒙层（不影响点位识别）
+   注意：不设置 position，避免覆盖原 .map-container 的 absolute 定位导致高度塌陷
+   ============================================================ */
+.map-container::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(
+    135deg,
+    rgba(255, 246, 224, 0.18) 0%,
+    rgba(255, 246, 224, 0) 45%,
+    rgba(255, 240, 220, 0.1) 100%
+  );
+  z-index: 1;
+  border-radius: inherit;
+}
+
+/* ============================================================
+   Marker SVG 图标适配
+   ============================================================ */
+.tangdao-marker__icon {
+  display: block;
+  width: 16px; height: 16px;
+  color: #fff;
+  transform: rotate(45deg);
+}
+.tangdao-marker__icon svg {
+  width: 100%; height: 100%;
+  display: block;
+}
+.tangdao-marker__icon svg [stroke] {
+  stroke: #fff;
+}
+.tangdao-marker__icon svg [fill="currentColor"] {
+  fill: #fff;
+}
+/* hover 轻微放大 */
+.tangdao-marker:hover .tangdao-marker__pin {
+  transform: rotate(-45deg) scale(1.12);
+}
+
+/* ============================================================
+   筛选条 SVG 图标
+   ============================================================ */
+.filter-chip__icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px; height: 18px;
+  flex-shrink: 0;
+}
+.filter-chip__icon svg {
+  width: 100%; height: 100%;
+  display: block;
+}
+
+/* ============================================================
+   图例 SVG 图标
+   ============================================================ */
+.legend-row__icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px; height: 16px;
+  flex-shrink: 0;
+}
+.legend-row__icon svg {
+  width: 100%; height: 100%;
+  display: block;
+}
+
+/* ============================================================
+   图例精致化 + 可收起
+   ============================================================ */
+.map-legend {
+  border-radius: var(--radius-md);
+  box-shadow: 0 4px 20px rgba(107, 78, 46, 0.1);
+  border: 1px solid rgba(232, 221, 202, 0.7);
+  transition: transform var(--transition-base), box-shadow var(--transition-base);
+  max-height: 360px;
+  overflow: hidden;
+}
+.map-legend.collapsed {
+  max-height: 44px;
+}
+.map-legend.collapsed .legend-row {
+  display: none;
+}
+.map-legend h4 {
+  cursor: pointer;
+  user-select: none;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.map-legend h4::after {
+  content: "−";
+  font-size: 1.1rem;
+  color: var(--wood-400);
+  transition: transform var(--transition-base);
+}
+.map-legend.collapsed h4::after {
+  content: "+";
+}
+
+/* ============================================================
+   缩放控件精致化
+   ============================================================ */
+.zoom-control {
+  border-radius: var(--radius-md);
+  box-shadow: 0 4px 16px rgba(107, 78, 46, 0.12);
+  border: 1px solid rgba(232, 221, 202, 0.7);
+  overflow: hidden;
+}
+.zoom-control button {
+  transition: background var(--transition-fast), color var(--transition-fast);
+}
+.zoom-control button:hover {
+  background: var(--wood-50);
+  color: var(--wood-600);
+}
+
+/* ============================================================
+   筛选条 hover 上浮
+   ============================================================ */
+.filter-chip {
+  transition: transform var(--transition-fast), background var(--transition-fast), color var(--transition-fast), box-shadow var(--transition-fast);
+}
+.filter-chip:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 3px 10px rgba(107, 78, 46, 0.08);
+}
+.filter-chip.is-active:hover {
+  transform: translateY(-1px);
+}
+
+/* ============================================================
+   加载淡入
+   ============================================================ */
+.map-page > * {
+  animation: mapFadeIn 0.6s ease-out both;
+}
+.map-page > *:nth-child(2) { animation-delay: 0.1s; }
+.map-page > *:nth-child(3) { animation-delay: 0.2s; }
+@keyframes mapFadeIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* ============================================================
+   移动端适配
+   ============================================================ */
+@media (max-width: 768px) {
+  .map-nav { padding: 0.6rem 0; }
+  .map-nav__subtitle { display: none; }
+  .now-status {
+    position: absolute;
+    top: 100%;
+    right: 1rem;
+    margin-left: 0;
+    margin-top: 0.5rem;
+    z-index: 5;
+    background: rgba(255, 252, 245, 0.92);
+    box-shadow: 0 4px 16px rgba(107, 78, 46, 0.12);
+  }
+  .now-status__row { gap: 0.5rem; }
+  .now-status__sunset { display: none; }
+  .now-status__time { font-size: 0.95rem; }
+}
+
+@media (max-width: 480px) {
+  .map-nav__brand .brand__cn { font-size: 1.15rem; }
+  .map-nav__brand .brand__en { font-size: 0.62rem; }
+  .now-status__eyebrow { display: none; }
+  .now-status__weather { padding: 0.1rem 0.35rem; }
+}

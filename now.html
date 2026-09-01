@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>正在发生 · 躺岛 TANGDAO</title>
+  <meta name="description" content="Where × When × Who × Mood · 陵水现在正在发生什么。" />
+  <link rel="icon" type="image/svg+xml" href="/assets/favicon.svg" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,400&family=Jost:wght@300;400;500&family=Noto+Serif+SC:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <!-- 独立视觉系统，不引用 style.css / today.css -->
+  <link rel="stylesheet" href="/css/now.css" />
+  <link rel="stylesheet" href="/css/post-snippets.css" />
+</head>
+<body class="now-page">
+
+  <!-- 顶部品牌条（与现有页面保持一致的极简导航） -->
+  <header class="now-topbar">
+    <a href="/index.html" class="now-topbar__brand">
+      躺岛 TANGDAO
+      <em>Lingshui Slow Living</em>
+    </a>
+    <nav class="now-topbar__nav">
+      <a href="/index.html">首页</a>
+      <a href="/map.html">地图</a>
+      <a href="/today.html">今天去哪</a>
+      <a href="/now.html">正在发生</a>
+      <a href="/community">岛民漂流帖</a>
+      <a href="/collection">我的躺岛</a>
+    </nav>
+    <a href="/map.html" class="now-topbar__back">← 返回地图</a>
+  </header>
+
+  <!-- ============================================
+       NowPlacePage · 页面主容器
+       左右分栏 55% / 45%，接近 100vh
+       ============================================ -->
+  <main class="now-page__main" id="nowPlacePage">
+
+    <div class="now-grid">
+
+      <!-- ============ 场景 B 角落装饰（每屏≤4，极简线条，opacity 0.22） ============ -->
+      <!-- 小椰子 · 左上 -->
+      <svg class="deco-elem deco-coconut" viewBox="0 0 48 48" fill="none" aria-hidden="true">
+        <ellipse cx="24" cy="30" rx="14" ry="15" stroke="#8A6A3A" stroke-width="1.2"/>
+        <path d="M24 15 Q20 8 16 6 M24 15 Q28 8 32 6 M24 15 L24 4" stroke="#B8C69B" stroke-width="1.2" stroke-linecap="round"/>
+      </svg>
+      <!-- 海浪线 · 右下 -->
+      <svg class="deco-elem deco-wave-line" viewBox="0 0 120 32" fill="none" aria-hidden="true">
+        <path d="M2 16 Q12 4 22 16 T42 16 T62 16 T82 16 T102 16 T118 16" stroke="#6FB7C5" stroke-width="1.2" stroke-linecap="round" opacity="0.7"/>
+        <path d="M2 22 Q12 10 22 22 T42 22 T62 22 T82 22 T102 22 T118 22" stroke="#4E96A8" stroke-width="0.8" stroke-linecap="round" opacity="0.5"/>
+      </svg>
+      <!-- 鸡尾酒 · 右上 -->
+      <svg class="deco-elem deco-cocktail" viewBox="0 0 32 48" fill="none" aria-hidden="true">
+        <path d="M4 6 L28 6 L16 22 Z" stroke="#A8623F" stroke-width="1.2" stroke-linejoin="round"/>
+        <line x1="16" y1="22" x2="16" y2="42" stroke="#A8623F" stroke-width="1.2"/>
+        <line x1="12" y1="42" x2="20" y2="42" stroke="#A8623F" stroke-width="1.2" stroke-linecap="round"/>
+        <circle cx="22" cy="9" r="1.5" fill="#E0A98F" opacity="0.6"/>
+      </svg>
+
+      <!-- ============ 左侧 55%：PlaceHero 大幅地点场景视觉 ============ -->
+      <section class="place-hero" id="placeHero">
+        <div class="place-hero__media">
+          <img src="/assets/img/hero.jpg" alt="陵水海边场景" class="place-hero__img" />
+          <!-- 场景上的极简浮层标签（地点名由 JS 动态填充） -->
+          <div class="place-hero__overlay">
+            <p class="place-hero__eyebrow">WHERE</p>
+            <p class="place-hero__location" id="heroLocation">Lingshui · 陵水</p>
+          </div>
+          <!-- 椰子树影 / 水面反光装饰（纯 CSS，静态） -->
+          <span class="place-hero__shadow place-hero__shadow--palm"></span>
+          <span class="place-hero__shadow place-hero__shadow--wave"></span>
+        </div>
+      </section>
+
+      <!-- ============ 右侧 45%：动态时间信息（大量留白） ============ -->
+      <aside class="now-panel" id="nowPanel">
+
+        <!-- 顶部标题区（地点名由 JS 从 POI JSON 动态填充） -->
+        <div class="now-panel__head">
+          <p class="now-panel__eyebrow">NOW AT THIS PLACE</p>
+          <h1 class="now-panel__title" id="placeTitle">加载中…</h1>
+          <p class="now-panel__subtitle">Where × When × Who × Mood</p>
+          <button class="place-collect-btn" id="placeCollectBtn" type="button">🔖 收藏这个地点</button>
+        </div>
+
+        <!-- Today Timeline · 右侧核心（数据由 js/now.js 从 data/place-events.json 渲染） -->
+        <section class="today-timeline" id="todayTimeline">
+          <header class="component__head">
+            <p class="component__eyebrow">TODAY</p>
+            <h2 class="component__title">今天发生什么</h2>
+          </header>
+          <ol class="timeline" id="timelineList">
+            <!-- 时间轴项由 JS 动态渲染 -->
+          </ol>
+        </section>
+
+        <!-- Week Events · 次级（横向轻量活动条，数据由 JS 渲染） -->
+        <section class="week-events" id="weekEvents">
+          <header class="component__head">
+            <p class="component__eyebrow">THIS WEEK</p>
+            <h2 class="component__title">本周发生什么</h2>
+          </header>
+          <div class="week-strip" id="weekStrip">
+            <!-- 横向活动条由 JS 动态渲染 -->
+          </div>
+        </section>
+
+        <!-- Recent Changes · 次级（数据由 JS 渲染） -->
+        <section class="recent-changes" id="recentChanges">
+          <header class="component__head">
+            <p class="component__eyebrow">RECENT</p>
+            <h2 class="component__title">最近有什么变化</h2>
+          </header>
+          <ul class="change-list" id="changeList">
+            <!-- 变化项由 JS 动态渲染 -->
+          </ul>
+        </section>
+
+        <!-- 这地方最近有人说 · 相关帖子（按 placeId 聚合，由 JS 动态填充） -->
+        <section class="place-posts" id="placePosts" style="display:none;">
+          <header class="component__head">
+            <p class="component__eyebrow">VOICES</p>
+            <h2 class="component__title">这地方最近有人说</h2>
+          </header>
+          <div class="place-posts__list" id="placePostsList">
+            <!-- 相关帖子摘要由 JS 动态渲染 -->
+          </div>
+        </section>
+
+        <!-- Place Basic Info · 最下面（由 JS 从 POI JSON 动态填充） -->
+        <section class="place-basic" id="placeBasicInfo">
+          <header class="component__head">
+            <p class="component__eyebrow">INFO</p>
+            <h2 class="component__title">基础信息</h2>
+          </header>
+          <dl class="basic-info" id="basicInfoList">
+            <!-- 基础信息由 JS 动态渲染 -->
+          </dl>
+        </section>
+
+      </aside>
+    </div>
+
+    <!-- ============ 下方全宽：Live Comments 最近留言 ============ -->
+    <section class="live-comments" id="liveComments">
+      <header class="live-comments__head">
+        <p class="component__eyebrow">LIVE · RECENT MESSAGES</p>
+        <h2 class="component__title">最近有人在这里说</h2>
+        <!-- 明确标记为示意留言，避免误以为真实评论 -->
+        <p class="live-comments__disclaimer">示意留言 · Demo Comments</p>
+      </header>
+      <!-- 浮动容器：留言从右向左缓慢漂浮，由 js/now.js 从 data/demo-comments.json 动态生成 -->
+      <div class="live-comments__float" id="liveCommentsFloat" aria-label="示意留言流动区">
+        <!-- comment-bubble 由 JS 动态生成 -->
+      </div>
+    </section>
+
+  </main>
+
+  <!-- 页脚 -->
+  <footer class="now-footer">
+    <p>躺岛 TANGDAO · 陵水慢生活地图</p>
+    <p class="now-footer__sub">Where × When × Who × Mood</p>
+  </footer>
+
+  <script src="/js/collection-store.js"></script>
+  <script src="/js/post-by-place.js"></script>
+  <script src="/js/now.js"></script>
+</body>
+</html>

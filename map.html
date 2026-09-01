@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>躺岛 TANGDAO · 陵水慢生活地图</title>
+  <meta name="description" content="躺岛 TANGDAO 陵水实时互动地图，探索陵水慢生活去处。" />
+  <link rel="icon" type="image/svg+xml" href="/assets/favicon.svg" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,400&family=Jost:wght@300;400;500&family=Noto+Serif+SC:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/css/style.css" />
+  <link rel="stylesheet" href="/css/map.css" />
+  <link rel="stylesheet" href="/css/post-snippets.css" />
+</head>
+<body class="map-page">
+
+  <!-- 顶部导航栏（复用 style.css .nav，地图页内为文档流） -->
+  <header class="nav map-nav" id="mapNav">
+    <div class="nav__inner">
+      <!-- 品牌 + 副标题 -->
+      <div class="map-nav__brand">
+        <a href="/index.html" class="brand" aria-label="返回首页">
+          <span class="brand__cn">躺岛</span>
+          <span class="brand__en">TANGDAO</span>
+        </a>
+        <span class="map-nav__subtitle">陵水慢生活地图</span>
+      </div>
+
+      <!-- 全站导航 -->
+      <nav class="nav__links" id="navLinks">
+        <a href="/map.html" class="is-active">地图</a>
+        <a href="/today.html">今天去哪</a>
+        <a href="/now.html">正在发生</a>
+        <a href="/community">岛民漂流帖</a>
+        <a href="/collection">我的躺岛</a>
+      </nav>
+
+      <!-- Now in Lingshui 实时状态组件 -->
+      <div class="now-status" id="nowStatus">
+        <span class="now-status__eyebrow">NOW IN LINGSHUI</span>
+        <div class="now-status__row">
+          <!-- 时间（最突出，每秒更新） -->
+          <div class="now-status__time">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
+              <circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>
+            </svg>
+            <span id="liveClock">--:--:--</span>
+          </div>
+          <!-- 天气（带轻量动画，JS 动态切换图标） -->
+          <div class="now-status__weather now-weather--sun" id="nowWeather">
+            <svg class="now-weather__icon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+              <!-- 晴天：太阳发光 -->
+              <circle class="nw-sun-core" cx="12" cy="12" r="4.2" fill="#F2C879"/>
+              <g class="nw-sun-rays" stroke="#F2C879" stroke-width="1.4" stroke-linecap="round">
+                <path d="M12 3v2.2M12 18.8V21M3 12h2.2M18.8 12H21M5.6 5.6l1.6 1.6M16.8 16.8l1.6 1.6M5.6 18.4l1.6-1.6M16.8 7.2l1.6-1.6"/>
+              </g>
+            </svg>
+            <span class="now-status__temp" id="nowTemp">26°</span>
+            <span class="now-status__cond" id="nowCond">晴</span>
+          </div>
+          <!-- 日落 -->
+          <div class="now-status__sunset">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
+              <path d="M3 18h18M12 3v4M5.6 10.6l1.4 1.4M18.4 10.6l-1.4 1.4M2 14h20"/>
+              <path d="M12 8a4 4 0 014 4H8a4 4 0 014-4z" fill="currentColor" opacity="0.3"/>
+            </svg>
+            <span id="nowSunset">18:47</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- 移动端菜单按钮 -->
+      <button class="nav__toggle" id="navToggle" aria-label="菜单">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </header>
+
+  <!-- 分类筛选栏 -->
+  <nav class="filter-bar" id="filterBar" aria-label="地点分类筛选">
+    <div class="filter-bar__scroll" id="filterScroll">
+      <button class="filter-chip is-active" data-layer="all">
+        <span class="filter-chip__icon" style="color:var(--wood-500)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 3v2.5M12 18.5V21M3 12h2.5M18.5 12H21"/><path d="M12 7l1.8 3.2L17 12l-3.2 1.8L12 17l-1.8-3.2L7 12l3.2-1.8z" fill="currentColor" stroke="none"/></svg></span>
+        全部
+        <em id="count-all">0</em>
+      </button>
+      <!-- 分类按钮由 JS 动态生成 -->
+    </div>
+  </nav>
+
+  <!-- 地图容器 -->
+  <main class="map-stage">
+    <div id="amapContainer" class="map-container" aria-label="陵水互动地图"></div>
+
+    <!-- 缩放控制 -->
+    <div class="zoom-control" id="zoomControl">
+      <button id="zoomIn" aria-label="放大">+</button>
+      <span id="zoomLevel">12</span>
+      <button id="zoomOut" aria-label="缩小">−</button>
+    </div>
+
+    <!-- 图例 -->
+    <div class="map-legend" id="mapLegend"></div>
+
+    <!-- 地图加载/错误提示 -->
+    <div class="map-status" id="mapStatus">
+      <div class="map-status__box">
+        <span class="map-status__spinner"></span>
+        <p id="mapStatusText">正在加载陵水地图…</p>
+      </div>
+    </div>
+  </main>
+
+  <!-- 地点信息卡 -->
+  <aside class="poi-card" id="poiCard" aria-hidden="true">
+    <button class="poi-card__close" id="poiCardClose" aria-label="关闭">×</button>
+    <div class="poi-card__inner" id="poiCardInner">
+      <!-- 内容由 JS 填充 -->
+    </div>
+  </aside>
+
+  <!-- 配置缺失提示 -->
+  <div class="config-hint" id="configHint" hidden>
+    <h2>地图密钥未配置</h2>
+    <p>请在 <code>js/config.js</code> 中填入你的高德地图 JS API Key 与安全密钥。</p>
+    <p class="config-hint__sub">申请地址：<a href="https://lbs.amap.com/" target="_blank" rel="noopener">https://lbs.amap.com/</a></p>
+  </div>
+
+  <script src="/js/config.js"></script>
+  <script src="/js/collection-store.js"></script>
+  <script src="/js/post-by-place.js"></script>
+  <script src="/js/map.js"></script>
+</body>
+</html>

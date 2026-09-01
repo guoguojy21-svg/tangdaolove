@@ -1,0 +1,21 @@
+# 依赖
+node_modules/
+
+# 构建输出（GitHub Actions 自动生成，不需提交）
+dist/
+
+# 环境变量（包含真实 API Key，不可提交）
+.env
+.env.local
+.env.*.local
+
+# 构建生成的配置文件（由 build.js 从环境变量生成，包含 API Key）
+js/config.js
+
+# 操作系统
+.DS_Store
+Thumbs.db
+
+# 编辑器
+.vscode/
+.idea/

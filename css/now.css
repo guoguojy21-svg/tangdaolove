@@ -1,0 +1,855 @@
+/* ============================================
+   躺岛 TANGDAO · 「正在发生 NOW AT THIS PLACE」
+   独立视觉系统：海边活动组 · Sea Glass + Lagoon + Coconut
+   与 style.css（暖木）/ today.css（贝母白）完全隔离
+   设计基调：慵懒 · 浪漫 · 简单 · 质朴 · 海边生活方式感
+   避免：海洋科技感 / dashboard / 旅游模板 / 玻璃拟态 / SaaS / 纯白卡片阵列
+   ============================================ */
+
+:root {
+  /* ---------- 海边活动组色板 ---------- */
+  --sea-glass: #6FB7C5;       /* Sea Glass 主色 */
+  --lagoon-blue: #4E96A8;      /* Lagoon Blue 深蓝 */
+  --coconut-green: #B8C69B;    /* Coconut Green 点缀 */
+
+  /* ---------- 暖色基础背景 ---------- */
+  --warm-white: #FBF8F2;       /* 暖白 */
+  --pale-sand: #F3EBDD;        /* 浅沙色 */
+  --sun-beige: #EFE3CF;        /* 晒过太阳的米色 */
+
+  /* ---------- 语义色 ---------- */
+  --bg-base: #FBF8F2;
+  --bg-soft: #F3EBDD;
+  --bg-warm: #EFE3CF;
+  --text-main: #3A4438;        /* 深橄榄墨绿 */
+  --text-soft: #6B7264;
+  --text-faint: #9AA094;
+  --line-soft: rgba(74, 86, 68, 0.12);
+  --line-faint: rgba(74, 86, 68, 0.06);
+  --accent-sea: #6FB7C5;
+  --accent-lagoon: #4E96A8;
+  --accent-coconut: #B8C69B;
+
+  /* ---------- 字体 ---------- */
+  --serif-cn: "Noto Serif SC", "Songti SC", serif;
+  --serif-en: "Cormorant Garamond", Georgia, serif;
+  --sans: "Jost", "PingFang SC", "Microsoft YaHei", sans-serif;
+
+  /* ---------- 圆角与阴影（质朴，不塑料） ---------- */
+  --radius-sm: 3px;
+  --radius-md: 6px;
+  --radius-lg: 14px;
+  --shadow-soft: 0 6px 24px -12px rgba(58, 68, 56, 0.12);
+
+  /* ---------- 场景 B · 玻璃海视觉氛围新增 token ---------- */
+  /* 卡片高光：Sea Glass / Lagoon 极低透明度，晒过太阳的微光 */
+  --highlight-seaglass: rgba(111, 183, 197, 0.06);
+  --highlight-lagoon: rgba(78, 150, 168, 0.05);
+  /* 装饰元素统一透明度区间 */
+  --deco-opacity: 0.22;
+  /* Hero 动画时长（非常慢） */
+  --hero-dur-palm: 18s;
+  --hero-dur-wave: 22s;
+  --hero-dur-sun: 25s;
+}
+
+/* ============ 基础重置（独立） ============ */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html { scroll-behavior: smooth; }
+
+body.now-page {
+  background: var(--bg-base);
+  color: var(--text-main);
+  font-family: var(--sans);
+  font-size: 15px;
+  line-height: 1.7;
+  -webkit-font-smoothing: antialiased;
+  position: relative;
+}
+
+/* ---------- 页面纹理叠加层 ----------
+   沙粒纹理：repeating-radial-gradient 模拟细沙感
+   水光纹理：极淡线性渐变模拟水面反光
+   均 fixed 定位、pointer-events:none、opacity<0.05
+*/
+body.now-page::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  opacity: 0.04;
+  background-image:
+    repeating-radial-gradient(
+      circle at 20% 30%,
+      rgba(196, 168, 122, 0.5) 0px,
+      rgba(196, 168, 122, 0.5) 1px,
+      transparent 1px,
+      transparent 4px
+    ),
+    repeating-radial-gradient(
+      circle at 70% 60%,
+      rgba(196, 168, 122, 0.4) 0px,
+      rgba(196, 168, 122, 0.4) 1px,
+      transparent 1px,
+      transparent 5px
+    );
+}
+body.now-page::after {
+  content: "";
+  position: fixed;
+  inset: -5% -10%;
+  z-index: 0;
+  pointer-events: none;
+  opacity: 0.045;
+  background: linear-gradient(
+    125deg,
+    transparent 30%,
+    rgba(111, 183, 197, 0.5) 45%,
+    transparent 55%,
+    rgba(239, 227, 207, 0.6) 70%,
+    transparent 80%
+  );
+  /* 水光缓慢漂移（仅 transform，GPU 加速） */
+}
+@media (prefers-reduced-motion: no-preference) {
+  body.now-page::after {
+    animation: heroWaterDrift 40s ease-in-out infinite alternate;
+  }
+}
+@keyframes heroWaterDrift {
+  from { transform: translateX(-8px) translateY(-4px); }
+  to   { transform: translateX(8px) translateY(4px); }
+}
+
+/* 确保主内容在纹理层之上 */
+.now-page__main { position: relative; z-index: 1; }
+
+img { display: block; max-width: 100%; }
+a { color: inherit; text-decoration: none; }
+ul, ol { list-style: none; }
+button { font-family: inherit; cursor: pointer; border: none; background: none; }
+
+/* ============ 顶部导航条（极简，与现有页面呼应） ============ */
+.now-topbar {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem 2.5rem;
+  background: rgba(251, 248, 242, 0.88);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border-bottom: 1px solid var(--line-faint);
+}
+.now-topbar__brand {
+  font-family: var(--serif-cn);
+  font-size: 1.05rem;
+  font-weight: 500;
+  letter-spacing: 0.15em;
+  color: var(--text-main);
+}
+.now-topbar__brand em {
+  display: block;
+  font-family: var(--serif-en);
+  font-size: 0.62rem;
+  font-style: normal;
+  font-weight: 400;
+  letter-spacing: 0.25em;
+  color: var(--text-faint);
+  margin-top: 2px;
+}
+.now-topbar__nav {
+  display: flex;
+  gap: 2rem;
+}
+.now-topbar__nav a {
+  font-family: var(--serif-cn);
+  font-size: 0.9rem;
+  color: var(--text-soft);
+  letter-spacing: 0.08em;
+  transition: color 0.2s;
+  position: relative;
+}
+.now-topbar__nav a:hover { color: var(--accent-lagoon); }
+.now-topbar__nav a.is-active { color: var(--accent-lagoon); }
+.now-topbar__nav a.is-active::after {
+  content: "";
+  position: absolute;
+  left: 50%; bottom: -6px;
+  transform: translateX(-50%);
+  width: 4px; height: 4px;
+  border-radius: 50%;
+  background: var(--accent-lagoon);
+}
+.now-topbar__back {
+  font-size: 0.85rem;
+  color: var(--text-soft);
+  letter-spacing: 0.05em;
+  transition: color 0.2s;
+}
+.now-topbar__back:hover { color: var(--accent-lagoon); }
+
+/* ============ NowPlacePage 主容器 ============ */
+.now-page__main {
+  padding-top: 72px; /* 为固定导航条让位 */
+}
+
+/* 左右分栏 Grid：55% / 45%，接近 100vh */
+.now-grid {
+  display: grid;
+  grid-template-columns: 55% 45%;
+  min-height: calc(100vh - 72px);
+}
+
+/* ============ 左侧 PlaceHero ============ */
+.place-hero {
+  position: relative;
+  overflow: hidden;
+}
+.place-hero__media {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  min-height: calc(100vh - 72px);
+}
+.place-hero__img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  filter: saturate(0.92) brightness(0.98);
+}
+/* 图片上的暖色调遮罩，统一到海边色系 */
+.place-hero__media::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    180deg,
+    rgba(111, 183, 197, 0.08) 0%,
+    rgba(78, 150, 168, 0.04) 40%,
+    rgba(239, 227, 207, 0.18) 100%
+  );
+  z-index: 1;
+}
+
+/* ---------- 水面光斑层（非常缓慢漂移） ---------- */
+.place-hero__media::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  opacity: 0.5;
+  background:
+    radial-gradient(ellipse 180px 40px at 25% 35%, rgba(255, 248, 230, 0.35), transparent 70%),
+    radial-gradient(ellipse 220px 50px at 65% 55%, rgba(255, 248, 230, 0.28), transparent 75%),
+    radial-gradient(ellipse 150px 35px at 45% 75%, rgba(255, 248, 230, 0.22), transparent 70%);
+}
+
+/* ---------- Hero 动画（仅 transform / opacity，GPU 加速） ---------- */
+@media (prefers-reduced-motion: no-preference) {
+  /* 椰树影摇摆：非常慢，±2deg */
+  .place-hero__shadow--palm {
+    animation: heroPalmSway var(--hero-dur-palm) ease-in-out infinite alternate;
+    transform-origin: top right;
+  }
+  @keyframes heroPalmSway {
+    from { transform: rotate(-2deg); }
+    to   { transform: rotate(2deg); }
+  }
+  /* 水面光斑移动：缓慢横向漂移 */
+  .place-hero__media::before {
+    animation: heroWaterSpot var(--hero-dur-wave) ease-in-out infinite alternate;
+  }
+  @keyframes heroWaterSpot {
+    from { transform: translateX(-12px); opacity: 0.4; }
+    to   { transform: translateX(12px); opacity: 0.6; }
+  }
+  /* 日光渐层变化：遮罩层 opacity 微变 */
+  .place-hero__media::after {
+    animation: heroSunlight var(--hero-dur-sun) ease-in-out infinite alternate;
+  }
+  @keyframes heroSunlight {
+    from { opacity: 0.7; }
+    to   { opacity: 1; }
+  }
+}
+/* 场景浮层标签 */
+.place-hero__overlay {
+  position: absolute;
+  left: 2.5rem;
+  bottom: 2.5rem;
+  z-index: 3;
+  color: #FBF8F2;
+  text-shadow: 0 2px 12px rgba(0,0,0,0.3);
+}
+.place-hero__eyebrow {
+  font-family: var(--serif-en);
+  font-size: 0.7rem;
+  letter-spacing: 0.4em;
+  opacity: 0.85;
+  margin-bottom: 0.4rem;
+}
+.place-hero__location {
+  font-family: var(--serif-cn);
+  font-size: 1.6rem;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+}
+/* 椰子树影装饰（纯 CSS，静态） */
+.place-hero__shadow {
+  position: absolute;
+  pointer-events: none;
+  z-index: 2;
+}
+.place-hero__shadow--palm {
+  top: -40px; right: -30px;
+  width: 260px; height: 260px;
+  background: radial-gradient(ellipse at center, rgba(58,68,56,0.12) 0%, transparent 70%);
+  filter: blur(8px);
+}
+.place-hero__shadow--wave {
+  bottom: 0; left: 0; right: 0;
+  height: 120px;
+  background: linear-gradient(180deg, transparent, rgba(111,183,197,0.15));
+}
+
+.now-grid {
+  display: grid;
+  grid-template-columns: 55% 45%;
+  min-height: calc(100vh - 72px);
+  position: relative;
+}
+
+/* ============ 场景 B 角落装饰（每屏≤4，极简线条） ============ */
+.deco-elem {
+  position: absolute;
+  z-index: 2;
+  pointer-events: none;
+  opacity: var(--deco-opacity);
+}
+/* 小椰子 · 左上（Hero 区域上方） */
+.deco-coconut {
+  top: 96px;
+  left: 32px;
+  width: 44px;
+  height: 44px;
+}
+/* 鸡尾酒 · 右上（Hero 区域右侧，面板边界左侧） */
+.deco-cocktail {
+  top: 100px;
+  right: calc(45% + 36px);
+  width: 30px;
+  height: 44px;
+}
+/* 海浪线 · 左下（Hero 区域底部） */
+.deco-wave-line {
+  bottom: 64px;
+  left: 48px;
+  width: 110px;
+  height: 30px;
+}
+/* 装饰元素在移动端隐藏（减少视觉干扰） */
+@media (max-width: 900px) {
+  .deco-elem { display: none; }
+}
+
+/* ============ 右侧 Now Panel（大量留白） ============ */
+.now-panel {
+  background: var(--bg-soft);
+  padding: 4rem 4rem 3.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 2.8rem;
+  overflow-y: auto;
+  max-height: calc(100vh - 72px);
+}
+
+/* 顶部标题区 */
+.now-panel__head {
+  padding-bottom: 0.5rem;
+}
+.now-panel__eyebrow {
+  font-family: var(--serif-en);
+  font-size: 0.72rem;
+  letter-spacing: 0.35em;
+  color: var(--accent-lagoon);
+  margin-bottom: 0.8rem;
+  text-transform: uppercase;
+}
+.now-panel__title {
+  font-family: var(--serif-cn);
+  font-size: 2.6rem;
+  font-weight: 600;
+  line-height: 1.25;
+  color: var(--text-main);
+  letter-spacing: 0.04em;
+  margin-bottom: 0.6rem;
+}
+.now-panel__subtitle {
+  font-family: var(--serif-en);
+  font-style: italic;
+  font-size: 0.95rem;
+  color: var(--text-faint);
+  letter-spacing: 0.05em;
+}
+
+/* 通用组件头部 */
+.component__head {
+  margin-bottom: 1.2rem;
+}
+.component__eyebrow {
+  font-family: var(--serif-en);
+  font-size: 0.68rem;
+  letter-spacing: 0.3em;
+  color: var(--accent-sea);
+  text-transform: uppercase;
+  margin-bottom: 0.4rem;
+}
+.component__title {
+  font-family: var(--serif-cn);
+  font-size: 1.15rem;
+  font-weight: 500;
+  color: var(--text-main);
+  letter-spacing: 0.05em;
+}
+
+/* ============ 这地方最近有人说 · 相关帖子（按 placeId 聚合） ============ */
+.place-posts {
+  margin-bottom: 1.6rem;
+}
+.place-posts__list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.7rem;
+}
+
+/* ============ Today Timeline（核心组件） ============ */
+.timeline {
+  position: relative;
+  padding-left: 0.5rem;
+}
+.timeline::before {
+  content: "";
+  position: absolute;
+  left: 64px; top: 10px; bottom: 10px;
+  width: 1px;
+  background: var(--line-soft);
+}
+.timeline__item {
+  position: relative;
+  display: grid;
+  grid-template-columns: 48px 16px 1fr;
+  align-items: start;
+  gap: 0.8rem;
+  padding: 0.5rem 0;
+}
+.timeline__time {
+  font-family: var(--sans);
+  font-size: 0.78rem;
+  font-weight: 500;
+  color: var(--text-soft);
+  letter-spacing: 0.05em;
+  padding-top: 2px;
+}
+.timeline__dot {
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  background: var(--bg-warm);
+  border: 1.5px solid var(--accent-sea);
+  margin-top: 6px;
+  z-index: 2;
+  position: relative;
+  transition: all 0.3s ease;
+}
+/* ---------- 状态：过去 · 淡化 ---------- */
+.timeline__item--past { opacity: 0.45; }
+.timeline__item--past .timeline__dot {
+  background: transparent;
+  border-color: var(--text-faint);
+}
+/* ---------- 状态：当前 · 高亮 + 呼吸 ---------- */
+.timeline__item--current .timeline__time {
+  color: var(--accent-lagoon);
+  font-weight: 600;
+}
+.timeline__item--current .timeline__event {
+  color: var(--accent-lagoon);
+  font-weight: 600;
+}
+.timeline__dot--current {
+  background: var(--accent-lagoon);
+  border-color: var(--accent-lagoon);
+  animation: timelineBreathing 2.4s ease-in-out infinite;
+}
+/* 呼吸动画：box-shadow 扩散脉冲（非 opacity 闪烁，水滴感珠光） */
+@keyframes timelineBreathing {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(78, 150, 168, 0.30); }
+  50%      { box-shadow: 0 0 0 6px rgba(78, 150, 168, 0); }
+}
+/* ---------- 状态：未来 · 正常显示（默认） ---------- */
+.timeline__event {
+  font-family: var(--serif-cn);
+  font-size: 0.95rem;
+  font-weight: 500;
+  color: var(--text-main);
+  margin-bottom: 0.15rem;
+}
+.timeline__desc {
+  font-size: 0.82rem;
+  color: var(--text-soft);
+  line-height: 1.5;
+}
+
+/* ============ Week Events · 横向轻量活动条 ============ */
+.week-strip {
+  display: flex;
+  gap: 0.8rem;
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding: 0.3rem 0.2rem 0.8rem;
+  scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch;
+}
+.week-strip::-webkit-scrollbar { height: 4px; }
+.week-strip::-webkit-scrollbar-track { background: transparent; }
+.week-strip::-webkit-scrollbar-thumb {
+  background: var(--line-soft);
+  border-radius: 2px;
+}
+.week-strip__empty {
+  font-size: 0.82rem;
+  color: var(--text-faint);
+  padding: 0.5rem 0;
+}
+.week-card {
+  flex-shrink: 0;
+  scroll-snap-align: start;
+  width: 168px;
+  padding: 1rem 1.1rem;
+  background: var(--bg-base);
+  border: 1px solid var(--line-faint);
+  border-radius: var(--radius-md);
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  position: relative;
+  overflow: hidden;
+  transition: border-color 0.25s, box-shadow 0.25s;
+}
+/* 晒过太阳的微光高光：Sea Glass + Lagoon 极低透明度 */
+.week-card::before {
+  content: "";
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 60%;
+  background: linear-gradient(135deg, var(--highlight-seaglass), transparent 70%);
+  pointer-events: none;
+}
+.week-card:hover {
+  border-color: rgba(111,183,197,0.35);
+  box-shadow: var(--shadow-soft);
+}
+.week-card__date {
+  font-family: var(--serif-en);
+  font-size: 0.82rem;
+  font-weight: 500;
+  color: var(--accent-sea);
+  letter-spacing: 0.04em;
+}
+.week-card__day {
+  font-size: 0.66rem;
+  color: var(--text-faint);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+.week-card__name {
+  font-family: var(--serif-cn);
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: var(--text-main);
+  line-height: 1.4;
+  margin-top: 0.2rem;
+}
+.week-card__loc {
+  font-size: 0.74rem;
+  color: var(--text-faint);
+  margin-top: 0.1rem;
+}
+
+/* ============ Recent Changes ============ */
+.change-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+.change-list__item {
+  display: flex;
+  align-items: baseline;
+  gap: 0.7rem;
+}
+.change-list__tag {
+  flex-shrink: 0;
+  font-family: var(--sans);
+  font-size: 0.62rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  padding: 0.14rem 0.5rem;
+  border-radius: 10px;
+  white-space: nowrap;
+  box-shadow: inset 0 1px 0 0 rgba(255, 248, 230, 0.35);
+}
+/* NEW · Coconut Green 半透明（非告警绿） */
+.change-list__tag--new {
+  background: rgba(184, 198, 155, 0.38);
+  color: #5A6B3F;
+}
+/* NOTICE · 暖沙棕半透明（非告警黄） */
+.change-list__tag--notice {
+  background: rgba(196, 168, 122, 0.32);
+  color: #8A6A3A;
+}
+/* HOT · 淡珊瑚橙半透明（非亮红） */
+.change-list__tag--hot {
+  background: rgba(224, 169, 143, 0.38);
+  color: #A8623F;
+}
+/* INFO · 海玻璃半透明（兜底） */
+.change-list__tag--info {
+  background: rgba(111, 183, 197, 0.18);
+  color: var(--accent-lagoon);
+}
+.change-list__empty {
+  font-size: 0.82rem;
+  color: var(--text-faint);
+}
+.change-list__text {
+  font-size: 0.85rem;
+  color: var(--text-soft);
+  line-height: 1.55;
+}
+/* HOT 讨论量数字强调 */
+.change-list__metric {
+  font-family: var(--serif-en);
+  font-size: 0.92rem;
+  font-weight: 600;
+  color: #A8623F;
+  letter-spacing: 0.02em;
+  margin-left: 0.15rem;
+}
+
+/* ============ Place Basic Info ============ */
+.basic-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+}
+.basic-info__row {
+  display: grid;
+  grid-template-columns: 5rem 1fr;
+  gap: 0.8rem;
+  padding: 0.5rem 0;
+  border-bottom: 1px solid var(--line-faint);
+}
+.basic-info__row:last-child { border-bottom: none; }
+.basic-info dt {
+  font-family: var(--serif-cn);
+  font-size: 0.8rem;
+  color: var(--text-faint);
+  letter-spacing: 0.05em;
+}
+.basic-info dd {
+  font-size: 0.85rem;
+  color: var(--text-main);
+}
+
+/* ============ Live Comments · 海风吹过来的几句话（示意留言） ============ */
+.live-comments {
+  padding: 4rem 2.5rem 3rem;
+  background: var(--bg-base);
+  border-top: 1px solid var(--line-faint);
+}
+.live-comments__head {
+  text-align: center;
+  margin-bottom: 1.5rem;
+}
+.live-comments__head .component__eyebrow { display: block; }
+.live-comments__head .component__title { font-size: 1.3rem; }
+/* 明确标识为示意留言 */
+.live-comments__disclaimer {
+  font-family: var(--sans);
+  font-size: 0.68rem;
+  color: var(--text-faint);
+  letter-spacing: 0.12em;
+  margin-top: 0.5rem;
+  text-transform: uppercase;
+}
+
+/* 浮动容器：留言从右向左缓慢漂浮 */
+.live-comments__float {
+  position: relative;
+  height: 180px;
+  overflow: hidden;
+  width: 100%;
+}
+
+/* 单条留言 bubble */
+.comment-bubble {
+  position: absolute;
+  right: -320px;            /* 起点：屏幕右侧外 */
+  top: var(--top-offset, 50%);
+  transform: translateY(-50%);
+  max-width: 280px;
+  padding: 0.55rem 0.9rem 0.55rem 1.2rem;
+  background: rgba(251, 248, 242, 0.82);
+  border: 1px solid rgba(111, 183, 197, 0.22);
+  border-radius: 18px;
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  box-shadow:
+    0 4px 14px -8px rgba(58, 68, 56, 0.18),
+    inset 0 1px 0 0 var(--highlight-seaglass);
+  cursor: pointer;
+  user-select: none;
+  /* JS 分配变量，CSS 只消费 */
+  animation: floatAcross var(--travel-duration, 24s) linear var(--anim-delay, 0s) 1 forwards;
+  transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.3s;
+}
+/* 留言文字：允许自然换行，最大宽度由父容器控制 */
+.comment-bubble__text {
+  font-family: var(--serif-cn);
+  font-size: 14px;
+  font-weight: 400;
+  color: var(--accent-lagoon);   /* 深海绿 */
+  letter-spacing: 0.02em;
+}
+.comment-bubble__author {
+  font-family: var(--sans);
+  font-size: 11px;
+  color: var(--text-faint);
+  margin-left: 0.5rem;
+  letter-spacing: 0.04em;
+}
+
+/* 漂浮动画：从右向左穿过整个页面 */
+@keyframes floatAcross {
+  from { transform: translateY(-50%) translateX(0); }
+  to   { transform: translateY(-50%) translateX(calc(-100vw - 360px)); }
+}
+
+/* hover：暂停当前留言 */
+.comment-bubble:hover {
+  animation-play-state: paused;
+  box-shadow: 0 6px 20px -6px rgba(58, 68, 56, 0.25);
+}
+
+/* 点击：轻微放大（JS toggle class，使用独立 scale 属性避免与 animation transform 冲突） */
+.comment-bubble--pop {
+  scale: 1.08;
+  z-index: 10;
+}
+
+/* ---------- 装饰元素：非常轻的海浪 / 小贝壳 / 小水滴 ---------- */
+.comment-bubble::before {
+  content: "";
+  position: absolute;
+  left: 6px; top: 50%;
+  transform: translateY(-50%);
+  opacity: 0.5;
+  pointer-events: none;
+}
+/* 海浪：小椭圆波浪线 */
+.comment-bubble--deco-wave::before {
+  width: 10px; height: 6px;
+  background: transparent;
+  border-radius: 50%;
+  box-shadow:
+    0 -3px 0 -1px rgba(111,183,197,0.5),
+    0  3px 0 -1px rgba(111,183,197,0.5);
+}
+/* 小贝壳：小圆带放射线（极简） */
+.comment-bubble--deco-shell::before {
+  width: 8px; height: 8px;
+  border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+  background: rgba(184,198,155,0.5);
+}
+/* 小水滴：上尖下圆 */
+.comment-bubble--deco-droplet::before {
+  width: 7px; height: 9px;
+  border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+  background: rgba(111,183,197,0.45);
+  transform: translateY(-50%) rotate(180deg);
+}
+
+/* ---------- 移动端：隐藏浮动留言区（减少性能与干扰） ---------- */
+@media (max-width: 900px) {
+  .live-comments__float { display: none; }
+}
+
+/* ============ 页脚 ============ */
+.now-footer {
+  text-align: center;
+  padding: 2rem 1rem 3rem;
+  color: var(--text-faint);
+  font-family: var(--serif-cn);
+  font-size: 0.82rem;
+  letter-spacing: 0.08em;
+}
+.now-footer__sub {
+  font-family: var(--serif-en);
+  font-style: italic;
+  font-size: 0.75rem;
+  margin-top: 0.3rem;
+}
+
+/* ============ 响应式（移动端降级单列） ============ */
+@media (max-width: 900px) {
+  .now-topbar { padding: 0.8rem 1.2rem; }
+  .now-topbar__nav { gap: 1.2rem; }
+  .now-topbar__brand { font-size: 0.95rem; }
+
+  .now-grid {
+    grid-template-columns: 1fr;
+    min-height: auto;
+  }
+  .place-hero { min-height: 60vh; }
+  .place-hero__media { min-height: 60vh; }
+
+  .now-panel {
+    max-height: none;
+    padding: 2.5rem 1.5rem;
+    gap: 2.2rem;
+  }
+  .now-panel__title { font-size: 2rem; }
+
+  .live-comments { padding: 3rem 1.2rem 2rem; }
+  .live-comments__strip { grid-template-columns: 1fr; }
+}
+
+/* ============ 收藏按钮（接入我的躺岛 store） ============ */
+.place-collect-btn {
+  margin-top: 0.6rem;
+  padding: 0.5rem 1rem;
+  font-size: 0.84rem;
+  color: var(--lagoon-blue, #4E96A8);
+  background: rgba(255,255,255,0.7);
+  border: 1px solid rgba(78,150,168,0.3);
+  border-radius: 20px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  align-self: flex-start;
+}
+.place-collect-btn:hover {
+  background: rgba(78,150,168,0.12);
+  border-color: var(--lagoon-blue, #4E96A8);
+}
+.place-collect-btn.is-saved {
+  color: #fff;
+  background: var(--lagoon-blue, #4E96A8);
+  border-color: var(--lagoon-blue, #4E96A8);
+}

@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="200" height="200">
+  <!-- TODO: 樱花贝 BLOSSOM SHELL 正式贝壳素材将由设计替换，当前为优雅矢量占位轮廓 -->
+  <defs>
+    <radialGradient id="blossomGrad" cx="45%" cy="30%" r="75%">
+      <stop offset="0%" stop-color="#FBF2F2"/>
+      <stop offset="100%" stop-color="#F0DADA"/>
+    </radialGradient>
+  </defs>
+  <path d="M100 30 C 62 30, 32 68, 32 110 C 32 150, 62 174, 100 174 C 138 174, 168 150, 168 110 C 168 68, 138 30, 100 30 Z" fill="url(#blossomGrad)" stroke="#D9A8A6" stroke-width="1.4"/>
+  <g stroke="#E0B0AE" stroke-width="0.8" fill="none" opacity="0.6">
+    <path d="M100 40 L100 165"/>
+    <path d="M66 52 Q100 82, 134 52"/>
+    <path d="M46 78 Q100 122, 154 78"/>
+    <path d="M36 108 Q100 156, 164 108"/>
+  </g>
+  <!-- 花瓣装饰 -->
+  <g fill="#E7BBB9" opacity="0.5">
+    <ellipse cx="78" cy="70" rx="5" ry="8" transform="rotate(-25 78 70)"/>
+    <ellipse cx="122" cy="70" rx="5" ry="8" transform="rotate(25 122 70)"/>
+    <ellipse cx="70" cy="120" rx="4" ry="7" transform="rotate(-15 70 120)"/>
+    <ellipse cx="130" cy="120" rx="4" ry="7" transform="rotate(15 130 120)"/>
+  </g>
+  <circle cx="100" cy="100" r="4" fill="#DFA69F" opacity="0.7"/>
+  <path d="M76 46 Q66 88, 82 128" stroke="#FFFFFF" stroke-width="3" fill="none" opacity="0.5" stroke-linecap="round"/>
+</svg>

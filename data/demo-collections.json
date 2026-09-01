@@ -1,0 +1,38 @@
+{
+  "disclaimer": "我的躺岛 · 示意收藏数据 Demo Collections",
+  "updatedAt": "2026-08-30T15:00:00+08:00",
+  "savedPlaces": [
+    { "placeId": 1, "savedAt": "2026-08-29T10:00:00+08:00", "note": "下午四点去，沙子是温的" },
+    { "placeId": 8, "savedAt": "2026-08-27T09:30:00+08:00", "note": "带吊床，适合发呆" },
+    { "placeId": 20, "savedAt": "2026-08-26T08:00:00+08:00", "note": "要坐船去，记得查船班" },
+    { "placeId": 5, "savedAt": "2026-08-25T17:00:00+08:00", "note": "傍晚有白鹭" },
+    { "placeId": 4, "savedAt": "2026-08-24T11:00:00+08:00", "note": "带娃首选，水很浅" },
+    { "placeId": 23, "savedAt": "2026-08-23T13:00:00+08:00", "note": "雨天来做手作" }
+  ],
+  "savedPosts": [
+    { "postId": "dp-007", "savedAt": "2026-08-29T15:00:00+08:00" },
+    { "postId": "dp-008", "savedAt": "2026-08-22T19:00:00+08:00" },
+    { "postId": "dp-019", "savedAt": "2026-08-23T15:30:00+08:00" }
+  ],
+  "routeBoards": [
+    {
+      "id": "board-weekend",
+      "title": "周末慢游线",
+      "updatedAt": "2026-08-30T15:00:00+08:00",
+      "stops": [
+        { "placeId": 4, "day": "Day 1 上午", "note": "香水湾戏水野餐" },
+        { "placeId": 20, "day": "Day 1 下午", "note": "海上咖啡看渔排" },
+        { "placeId": 1, "day": "Day 2 傍晚", "note": "清水湾看日落" }
+      ]
+    },
+    {
+      "id": "board-rainy",
+      "title": "雨天备选线",
+      "updatedAt": "2026-08-28T10:00:00+08:00",
+      "stops": [
+        { "placeId": 23, "day": "上午", "note": "河豚部落贝壳手作" },
+        { "placeId": 25, "day": "下午", "note": "疍家博物馆" }
+      ]
+    }
+  ]
+}

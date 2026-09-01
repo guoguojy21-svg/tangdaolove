@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="200" height="200">
+  <!-- TODO: 珍珠蚌 PEARL CLAM 正式贝壳素材将由设计替换，当前为优雅矢量占位轮廓 -->
+  <defs>
+    <radialGradient id="pearlGrad" cx="40%" cy="35%" r="75%">
+      <stop offset="0%" stop-color="#FBF6EF"/>
+      <stop offset="100%" stop-color="#F2E8DD"/>
+    </radialGradient>
+    <radialGradient id="pearlBall" cx="35%" cy="30%">
+      <stop offset="0%" stop-color="#FFFFFF"/>
+      <stop offset="70%" stop-color="#F5F0E8"/>
+      <stop offset="100%" stop-color="#E0D5C5"/>
+    </radialGradient>
+  </defs>
+  <!-- 上壳 -->
+  <path d="M100 30 C 60 30, 30 68, 30 108 C 30 120, 45 130, 100 130 C 155 130, 170 120, 170 108 C 170 68, 140 30, 100 30 Z" fill="url(#pearlGrad)" stroke="#C8BBA8" stroke-width="1.4"/>
+  <!-- 下壳 -->
+  <path d="M100 130 C 45 130, 30 140, 30 152 C 30 172, 65 180, 100 180 C 135 180, 170 172, 170 152 C 170 140, 155 130, 100 130 Z" fill="url(#pearlGrad)" stroke="#C8BBA8" stroke-width="1.4"/>
+  <!-- 珍珠 -->
+  <circle cx="100" cy="128" r="11" fill="url(#pearlBall)" stroke="#D5CAB8" stroke-width="0.8"/>
+  <ellipse cx="96" cy="124" rx="3" ry="2" fill="#FFFFFF" opacity="0.8"/>
+  <!-- 壳纹 -->
+  <g stroke="#D8CBB8" stroke-width="0.6" fill="none" opacity="0.5">
+    <path d="M55 60 Q100 50, 145 60"/>
+    <path d="M45 85 Q100 75, 155 85"/>
+    <path d="M40 108 Q100 100, 160 108"/>
+  </g>
+  <path d="M68 48 Q58 88, 74 118" stroke="#FFFFFF" stroke-width="2.8" fill="none" opacity="0.5" stroke-linecap="round"/>
+</svg>

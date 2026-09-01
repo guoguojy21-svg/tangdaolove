@@ -1,0 +1,36 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="200" height="200">
+  <!-- TODO: 太阳贝 SUN SHELL 正式贝壳素材将由设计替换，当前为优雅矢量占位轮廓 -->
+  <defs>
+    <radialGradient id="sunGrad" cx="45%" cy="30%" r="80%">
+      <stop offset="0%" stop-color="#FCE8E4"/>
+      <stop offset="100%" stop-color="#DFA69F"/>
+    </radialGradient>
+  </defs>
+  <!-- 放射状贝壳 -->
+  <g fill="url(#sunGrad)" stroke="#C98A82" stroke-width="1.2">
+    <!-- 中心圆盘 -->
+    <circle cx="100" cy="100" r="38"/>
+    <!-- 放射瓣 -->
+    <path d="M100 62 L92 24 L100 36 L108 24 Z"/>
+    <path d="M138 100 L176 92 L164 100 L176 108 Z"/>
+    <path d="M100 138 L108 176 L100 164 L92 176 Z"/>
+    <path d="M62 100 L24 108 L36 100 L24 92 Z"/>
+    <path d="M127 73 L154 46 L135 65 L145 48 Z"/>
+    <path d="M127 127 L154 154 L145 135 L154 152 Z"/>
+    <path d="M73 127 L46 154 L65 135 L48 145 Z"/>
+    <path d="M73 73 L46 46 L65 65 L48 54 Z"/>
+  </g>
+  <!-- 放射纹 -->
+  <g stroke="#C98A82" stroke-width="0.7" opacity="0.5">
+    <line x1="100" y1="62" x2="100" y2="30"/>
+    <line x1="138" y1="100" x2="170" y2="100"/>
+    <line x1="100" y1="138" x2="100" y2="170"/>
+    <line x1="62" y1="100" x2="30" y2="100"/>
+    <line x1="127" y1="73" x2="148" y2="52"/>
+    <line x1="127" y1="127" x2="148" y2="148"/>
+    <line x1="73" y1="127" x2="52" y2="148"/>
+    <line x1="73" y1="73" x2="52" y2="52"/>
+  </g>
+  <circle cx="100" cy="100" r="6" fill="#FFFFFF" opacity="0.5"/>
+  <path d="M78 78 Q70 100, 82 122" stroke="#FFFFFF" stroke-width="3" fill="none" opacity="0.45" stroke-linecap="round"/>
+</svg>

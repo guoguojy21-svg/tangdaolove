@@ -1,0 +1,1948 @@
+/* ============================================
+   躺岛 TANGDAO · 「今天去哪？」贝壳拾贝
+   独立视觉系统：贝母白 + 白沙 + 壳粉 + 海水反光
+   与首页暖木色板完全隔离，不引用 --wood-*/--sand-*
+   ============================================ */
+
+/* 手写字体自托管：防止 html-to-image 导出 PNG 时跨域字体丢失 */
+@font-face {
+  font-family: "Ma Shan Zheng";
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("../assets/fonts/MaShanZheng-Regular.ttf") format("truetype");
+}
+
+:root {
+  /* ---------- 主色板（用户指定 12 色） ---------- */
+  --shell-white: #F7F3EF;      /* 贝母白（全局基础 60%） */
+  --cream-white: #F2E8DD;      /* 奶油白 */
+  --warm-sand: #E7D5C1;        /* 暖白沙 */
+  --shell-pink: #E7BBB9;       /* 壳粉 */
+  --pale-coral: #DFA69F;       /* 淡珊瑚 */
+  --pearl-pink: #F0DADA;       /* 珍珠粉 */
+  --iris-purple: #E8E0ED;      /* 极浅虹彩紫 */
+  --shallow-blue: #D8EBEA;     /* 极浅海水蓝 */
+  --sea-blue: #9CCECE;         /* 浅海蓝 */
+  --deep-green: #27453F;       /* 深海墨绿 */
+  --ink-green: #3F4138;        /* 文字深棕绿 */
+
+  /* ---------- 语义化派生 ---------- */
+  --bg-base: #F7F3EF;
+  --bg-soft: #F2E8DD;
+  --bg-sand: #E7D5C1;
+  --text-main: #3F4138;
+  --text-soft: #6E6E62;        /* 比主文字稍浅 */
+  --text-faint: #9A9A8E;
+  --line-soft: rgba(63, 65, 56, 0.10);
+  --line-faint: rgba(63, 65, 56, 0.06);
+  --accent-pink: #E7BBB9;
+  --accent-coral: #DFA69F;
+  --accent-sea: #9CCECE;
+  --accent-deep: #27453F;
+
+  /* ---------- 字体 ---------- */
+  --handwrite: "Ma Shan Zheng", "STKaiti", "KaiTi", "Songti SC", serif;
+  --serif-cn: "Noto Serif SC", "Songti SC", serif;
+  --serif-en: "Cormorant Garamond", Georgia, serif;
+  --sans: "Jost", "PingFang SC", "Microsoft YaHei", sans-serif;
+
+  /* ---------- 圆角与阴影（克制，不塑料） ---------- */
+  --radius-sm: 3px;
+  --radius-md: 8px;
+  --radius-lg: 16px;
+  --shadow-paper: 0 4px 20px -8px rgba(63, 65, 56, 0.10);
+  --shadow-shell: 0 8px 30px -12px rgba(223, 166, 159, 0.25);
+}
+
+/* ============ 基础重置（独立于首页 style.css，避免样式污染） ============ */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { -webkit-text-size-adjust: 100%; }
+body {
+  font-family: var(--sans, "PingFang SC", sans-serif);
+  color: var(--text-main, #3F4138);
+  background: #F7F3EF; /* 贝母白 fallback，确保变量未加载时仍正确 */
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+a { color: inherit; text-decoration: none; }
+button { font-family: inherit; cursor: pointer; }
+ul { list-style: none; }
+
+/* ============ 页面底色 + 材质纹理 ============ */
+.today-page {
+  min-height: 100vh;
+  background: var(--bg-base);
+  color: var(--text-main);
+  font-family: var(--sans);
+  position: relative;
+  overflow-x: hidden;
+}
+
+/* 沙粒纸张纹理（极低透明度，仅触感） */
+.today-page::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  opacity: 0.04;
+  background-image:
+    radial-gradient(circle at 20% 30%, rgba(63, 65, 56, 0.5) 0.5px, transparent 1px),
+    radial-gradient(circle at 70% 60%, rgba(63, 65, 56, 0.4) 0.5px, transparent 1px),
+    radial-gradient(circle at 40% 80%, rgba(63, 65, 56, 0.4) 0.5px, transparent 1px);
+  background-size: 120px 120px, 180px 180px, 240px 240px;
+}
+
+/* 水面柔和反光 + 贝母珠光（右上角，低透明度） */
+.today-page::after {
+  content: "";
+  position: fixed;
+  top: -20%; right: -10%;
+  width: 60vw; height: 60vw;
+  z-index: 0;
+  pointer-events: none;
+  opacity: 0.05;
+  background: radial-gradient(circle at 30% 30%,
+    rgba(232, 224, 237, 0.8) 0%,
+    rgba(216, 235, 234, 0.6) 35%,
+    transparent 70%);
+  filter: blur(40px);
+}
+
+/* ============ 字体 class（为未来替换留 hook） ============ */
+.handwrite {
+  font-family: var(--handwrite);
+  font-weight: 400;
+  letter-spacing: 0.02em;
+  line-height: 1.5;
+}
+.serif-cn { font-family: var(--serif-cn); }
+.serif-en { font-family: var(--serif-en); font-style: italic; }
+
+/* ============ 通用容器 ============ */
+.today-container {
+  position: relative;
+  z-index: 2;
+  width: min(92%, 1100px);
+  margin-inline: auto;
+  padding-block: 2.5rem;
+}
+.quiz-width { width: min(100%, 760px); margin-inline: auto; }
+
+/* ============ 顶部小品牌条 ============ */
+.today-topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-block: 0.5rem;
+}
+.today-topbar__brand {
+  font-family: var(--serif-cn);
+  font-weight: 600;
+  font-size: 1rem;
+  letter-spacing: 0.2em;
+  color: var(--deep-green);
+}
+.today-topbar__brand em {
+  font-family: var(--serif-en);
+  font-style: italic;
+  font-weight: 400;
+  font-size: 0.72rem;
+  letter-spacing: 0.3em;
+  color: var(--text-faint);
+  display: block;
+  margin-top: 0.1rem;
+}
+.today-topbar__back {
+  font-size: 0.82rem;
+  color: var(--text-soft);
+  text-decoration: none;
+  letter-spacing: 0.1em;
+  transition: color 0.2s;
+}
+.today-topbar__back:hover { color: var(--deep-green); }
+
+/* ============ 页面状态容器 ============ */
+.today-stage {
+  position: relative;
+  z-index: 2;
+  min-height: calc(100vh - 120px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding-block: 2rem 4rem;
+}
+
+.page-state {
+  width: 100%;
+  display: none;
+  animation: fadeUp 0.6s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+.page-state[data-active="true"] { display: block; }
+
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* ============ 装饰元素基础 ============ */
+.deco {
+  position: absolute;
+  z-index: 1;
+  pointer-events: none;
+  opacity: 0.6;
+  color: var(--accent-pink);
+}
+.deco--sea { color: var(--accent-sea); opacity: 0.5; }
+.deco--deep { color: var(--deep-green); opacity: 0.4; }
+.deco svg { width: 100%; height: 100%; display: block; }
+
+/* ============ Intro 开场 ============ */
+.intro {
+  text-align: center;
+  position: relative;
+}
+.intro__inner {
+  position: relative;
+  padding: 1rem 0;
+}
+.intro__eyebrow {
+  font-family: var(--serif-en);
+  font-style: italic;
+  font-size: 0.85rem;
+  letter-spacing: 0.35em;
+  color: var(--text-faint);
+  margin-bottom: 1.5rem;
+}
+.intro__title {
+  font-family: var(--handwrite);
+  font-size: clamp(2.8rem, 7vw, 4.8rem);
+  color: var(--deep-green);
+  line-height: 1.3;
+  margin-bottom: 1.2rem;
+}
+.intro__lead {
+  font-family: var(--serif-cn);
+  font-size: clamp(1rem, 2.2vw, 1.18rem);
+  color: var(--text-soft);
+  line-height: 1.9;
+  max-width: 480px;
+  margin: 0 auto 2.8rem;
+}
+
+/* 中央粉白贝壳 */
+.intro__shell {
+  width: 120px; height: 120px;
+  margin: 0 auto 1.8rem;
+  animation: float 7s ease-in-out infinite;
+  position: relative;
+  z-index: 2;
+}
+.intro__shell svg { width: 100%; height: 100%; display: block; }
+@keyframes float {
+  0%, 100% { transform: translateY(0) rotate(-2deg); }
+  50% { transform: translateY(-12px) rotate(2deg); }
+}
+
+/* 贝壳后水面光纹 */
+.intro__ripples {
+  position: absolute;
+  top: 48px; left: 50%;
+  transform: translateX(-50%);
+  width: 200px; height: 80px;
+  z-index: 1;
+  pointer-events: none;
+}
+.intro__ripples span {
+  position: absolute;
+  inset: 0;
+  border: 1px solid var(--sea-blue);
+  border-radius: 50%;
+  opacity: 0;
+  animation: ripple 3s ease-out infinite;
+}
+.intro__ripples span:nth-child(2) { animation-delay: 1s; }
+.intro__ripples span:nth-child(3) { animation-delay: 2s; }
+@keyframes ripple {
+  0% { transform: scale(0.5); opacity: 0.5; }
+  100% { transform: scale(1.8); opacity: 0; }
+}
+
+/* Intro 小装饰 */
+.intro__deco-star {
+  position: absolute;
+  bottom: 20%; right: 12%;
+  width: 26px; height: 26px;
+  opacity: 0.7;
+  animation: float 5s ease-in-out infinite;
+}
+.intro__deco-star svg { width: 100%; height: 100%; }
+.intro__deco-petal {
+  position: absolute;
+  bottom: 28%; left: 14%;
+  width: 20px; height: 20px;
+  opacity: 0.7;
+  animation: float 6s ease-in-out infinite reverse;
+}
+.intro__deco-petal svg { width: 100%; height: 100%; }
+
+/* 主按钮（珠光扫过 hover） */
+.btn-shell {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.6rem;
+  padding: 0.9rem 2.6rem;
+  background: var(--deep-green);
+  color: var(--shell-white);
+  font-family: var(--serif-cn);
+  font-size: 0.98rem;
+  letter-spacing: 0.18em;
+  border: none;
+  border-radius: 3px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+.btn-shell::after {
+  content: "";
+  position: absolute;
+  top: 0; left: -120%;
+  width: 60%; height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(247, 243, 239, 0.45), transparent);
+  transform: skewX(-20deg);
+  transition: left 0.6s ease;
+}
+.btn-shell:hover {
+  background: #1d332e;
+  transform: translateY(-2px);
+  box-shadow: 0 10px 24px -8px rgba(39, 69, 63, 0.35);
+}
+.btn-shell:hover::after { left: 130%; }
+
+/* 珠光白按钮变体 */
+.btn-shell--pearl {
+  background: var(--shell-white);
+  color: var(--deep-green);
+  border: 1px solid var(--shell-pink);
+  box-shadow: 0 4px 16px -6px rgba(231, 187, 185, 0.4);
+}
+.btn-shell--pearl:hover {
+  background: var(--pearl-pink);
+  box-shadow: 0 8px 22px -8px rgba(231, 187, 185, 0.55);
+}
+
+.btn-ghost {
+  background: transparent;
+  color: var(--text-soft);
+  border: 1px solid var(--line-soft);
+}
+.btn-ghost:hover {
+  background: var(--bg-soft);
+  color: var(--deep-green);
+  transform: none;
+  box-shadow: none;
+}
+.btn-ghost::after { display: none; }
+
+/* ============ Quiz 问题页 ============ */
+.quiz { position: relative; }
+.quiz-stage {
+  position: relative;
+  min-height: 60vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* 顶部轻量栏 */
+.quiz__topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 2.5rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid var(--line-faint);
+}
+.quiz__back {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  background: transparent;
+  border: none;
+  color: var(--text-soft);
+  font-family: var(--serif-cn);
+  font-size: 0.88rem;
+  cursor: pointer;
+  padding: 0.3rem 0.5rem;
+  border-radius: 3px;
+  transition: all 0.25s;
+}
+.quiz__back svg { width: 16px; height: 16px; }
+.quiz__back:hover { color: var(--deep-green); background: var(--bg-soft); }
+
+.quiz__progress {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  flex: 1;
+  max-width: 200px;
+}
+.quiz__progress-bar {
+  flex: 1;
+  height: 2px;
+  background: var(--line-faint);
+  border-radius: 2px;
+  overflow: hidden;
+}
+.quiz__progress-fill {
+  height: 100%;
+  width: 0%;
+  background: linear-gradient(90deg, var(--shell-pink), var(--sea-blue));
+  transition: width 0.5s ease;
+}
+.quiz__progress-text {
+  font-family: var(--serif-en);
+  font-size: 0.78rem;
+  color: var(--text-faint);
+  white-space: nowrap;
+  letter-spacing: 0.1em;
+}
+
+.quiz__body {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.quiz__question {
+  font-family: var(--handwrite);
+  font-size: clamp(1.8rem, 4.5vw, 2.6rem);
+  color: var(--deep-green);
+  line-height: 1.45;
+  margin-bottom: 2.2rem;
+  text-align: center;
+}
+
+/* 选项：贝壳标本标签 / 白沙小收藏卡 */
+.quiz__options {
+  display: flex;
+  flex-direction: column;
+  gap: 0.9rem;
+}
+.quiz__options--grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.8rem;
+}
+.quiz__option {
+  display: flex;
+  align-items: center;
+  gap: 0.9rem;
+  padding: 1rem 1.2rem;
+  background: var(--shell-white);
+  border: 1px solid var(--line-soft);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+  text-align: left;
+  font-family: var(--serif-cn);
+  font-size: 0.98rem;
+  color: var(--text-main);
+  position: relative;
+  overflow: hidden;
+}
+/* 选项珠光扫过（hover + selected） */
+.quiz__option::after {
+  content: "";
+  position: absolute;
+  top: 0; left: -120%;
+  width: 50%; height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.5), transparent);
+  transform: skewX(-20deg);
+  transition: left 0.6s ease;
+  pointer-events: none;
+}
+.quiz__option:hover {
+  border-color: var(--shell-pink);
+  background: #FDF9F5;
+  transform: translateY(-4px);
+  box-shadow: 0 8px 20px -8px rgba(223, 166, 159, 0.35);
+}
+.quiz__option:hover::after { left: 130%; }
+.quiz__option:hover .quiz__option-label { transform: translateX(3px); }
+
+/* 装饰图标 */
+.quiz__option-deco {
+  flex-shrink: 0;
+  width: 34px; height: 34px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--shell-pink);
+  background: var(--pearl-pink);
+  border-radius: 50%;
+  opacity: 0.8;
+  transition: all 0.3s;
+}
+.quiz__option-deco svg { width: 18px; height: 18px; }
+.quiz__option:hover .quiz__option-deco {
+  color: var(--deep-green);
+  background: var(--shallow-blue);
+  opacity: 1;
+  transform: scale(1.05);
+}
+.quiz__option-main {
+  flex: 1;
+  min-width: 0;
+}
+.quiz__option-label {
+  display: block;
+  line-height: 1.4;
+  transition: transform 0.3s ease;
+}
+.quiz__option-sub {
+  display: block;
+  font-size: 0.82rem;
+  color: var(--text-faint);
+  margin-top: 0.2rem;
+}
+.quiz__option-letter {
+  flex-shrink: 0;
+  font-family: var(--serif-en);
+  font-style: italic;
+  font-size: 0.9rem;
+  color: var(--text-faint);
+  opacity: 0.6;
+}
+
+/* 选中状态：缩放 0.98 + 柔光底 + 高光扫过 */
+.quiz__option.is-selected {
+  transform: scale(0.98);
+  border-color: var(--sea-blue);
+  background: var(--shallow-blue);
+  box-shadow: 0 0 0 3px rgba(156, 206, 206, 0.2);
+}
+.quiz__option.is-selected::after { left: 130%; }
+.quiz__option.is-selected .quiz__option-deco {
+  color: var(--deep-green);
+  background: var(--shell-white);
+}
+
+/* ============ 每题背景轻微变化 ============ */
+.quiz-stage--energy { background: radial-gradient(circle at 80% 20%, rgba(231, 187, 185, 0.12), transparent 50%); }
+.quiz-stage--crowd { background: radial-gradient(circle at 20% 80%, rgba(216, 235, 234, 0.15), transparent 50%); }
+.quiz-stage--sun { background: radial-gradient(circle at 70% 30%, rgba(240, 218, 218, 0.18), transparent 55%); }
+.quiz-stage--activity { background: radial-gradient(circle at 30% 70%, rgba(156, 206, 206, 0.12), transparent 50%); }
+.quiz-stage--companion { background: radial-gradient(circle at 50% 50%, rgba(231, 187, 185, 0.10), transparent 60%); }
+.quiz-stage--emotion { background: radial-gradient(circle at 60% 40%, rgba(232, 224, 237, 0.15), transparent 55%); }
+
+/* ============ Loading 生成动画：水退→沙现→贝壳显露→文字 ============ */
+/* 时间轴变量（可在此统一调节节奏） */
+.loading {
+  --t-bg: 0s;
+  --t-water-in: 0.5s;
+  --t-water-out: 1.3s;
+  --t-shell: 1.3s;
+  --t-text: 2.2s;
+  position: relative;
+  text-align: center;
+  min-height: 60vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+/* 背景层：暖白 + 浅粉 + 浅沙径向渐变淡入 */
+.loading__bg {
+  position: absolute;
+  inset: -10%;
+  z-index: 0;
+  background:
+    radial-gradient(circle at 50% 40%, rgba(240,218,218,0.5), transparent 55%),
+    radial-gradient(circle at 70% 70%, rgba(216,235,234,0.35), transparent 50%),
+    radial-gradient(circle at 30% 30%, rgba(242,232,221,0.6), transparent 55%),
+    var(--shell-white);
+  opacity: 0;
+}
+.loading.is-animating .loading__bg {
+  animation: loadingBgFade 0.6s ease-out var(--t-bg) forwards;
+}
+@keyframes loadingBgFade {
+  to { opacity: 1; }
+}
+
+/* 水纹层：浅海水从上方流过再渐退 */
+.loading__water {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  overflow: hidden;
+}
+.loading__water-surface {
+  position: absolute;
+  top: -30%;
+  left: -20%;
+  width: 140%;
+  height: 80%;
+  background: linear-gradient(
+    180deg,
+    rgba(156,206,206,0.28) 0%,
+    rgba(216,235,234,0.18) 40%,
+    rgba(247,243,239,0) 100%
+  );
+  /* 柔和横向流动纹理 */
+  background-image:
+    linear-gradient(180deg, rgba(156,206,206,0.28) 0%, rgba(216,235,234,0.18) 40%, rgba(247,243,239,0) 100%),
+    repeating-linear-gradient(
+      90deg,
+      transparent 0,
+      transparent 40px,
+      rgba(255,255,255,0.15) 40px,
+      rgba(255,255,255,0.15) 42px
+    );
+  background-size: 100% 100%, 200px 100%;
+  background-position: 0 0, 0 0;
+  background-repeat: no-repeat, repeat-x;
+  opacity: 0;
+  border-radius: 0 0 50% 50% / 0 0 30% 30%;
+  filter: blur(3px);
+}
+.loading.is-animating .loading__water-surface {
+  animation: loadingWaterFlow 2.0s ease-in-out var(--t-water-in) forwards;
+}
+@keyframes loadingWaterFlow {
+  0%   { transform: translateY(-100%) translateX(0); opacity: 0; }
+  20%  { opacity: 1; }
+  60%  { transform: translateY(0) translateX(-3%); opacity: 1; }
+  100% { transform: translateY(110%) translateX(2%); opacity: 0; }
+}
+
+/* 沙面层：极浅沙纹渐显 */
+.loading__sand {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 35%;
+  z-index: 2;
+  pointer-events: none;
+  background:
+    linear-gradient(180deg, rgba(247,243,239,0) 0%, rgba(231,213,193,0.4) 100%);
+  opacity: 0;
+}
+.loading.is-animating .loading__sand {
+  animation: loadingSandRise 0.8s ease-out var(--t-water-out) forwards;
+}
+@keyframes loadingSandRise {
+  from { opacity: 0; transform: translateY(8%); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* 小沙粒 */
+.loading__grain {
+  position: absolute;
+  bottom: 12%;
+  width: 4px; height: 4px;
+  background: var(--warm-sand);
+  border-radius: 50%;
+  opacity: 0;
+}
+.loading__grain--1 { left: 28%; bottom: 14%; width: 5px; height: 5px; }
+.loading__grain--2 { left: 68%; bottom: 10%; width: 3px; height: 3px; }
+.loading__grain--3 { left: 42%; bottom: 8%; width: 4px; height: 4px; }
+.loading.is-animating .loading__grain {
+  animation: loadingGrainAppear 0.4s ease-out forwards;
+}
+.loading.is-animating .loading__grain--1 { animation-delay: calc(var(--t-water-out) + 0.1s); }
+.loading.is-animating .loading__grain--2 { animation-delay: calc(var(--t-water-out) + 0.25s); }
+.loading.is-animating .loading__grain--3 { animation-delay: calc(var(--t-water-out) + 0.4s); }
+@keyframes loadingGrainAppear {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 0.7; transform: translateY(0); }
+}
+
+/* 小装饰：海星 + 花瓣 */
+.loading__deco {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  pointer-events: none;
+}
+.loading__starfish {
+  position: absolute;
+  left: 22%;
+  top: 32%;
+  width: 22px; height: 22px;
+  opacity: 0;
+}
+.loading__starfish svg { width: 100%; height: 100%; }
+.loading.is-animating .loading__starfish {
+  animation: loadingDecoFloat 3.5s ease-in-out var(--t-water-out) forwards;
+}
+@keyframes loadingDecoFloat {
+  0%   { opacity: 0; transform: translateY(-8px) rotate(0deg); }
+  20%  { opacity: 0.7; }
+  100% { opacity: 0.6; transform: translateY(4px) rotate(8deg); }
+}
+.loading__petal {
+  position: absolute;
+  right: 24%;
+  top: 28%;
+  width: 18px; height: 18px;
+  opacity: 0;
+}
+.loading__petal svg { width: 100%; height: 100%; }
+.loading.is-animating .loading__petal {
+  animation: loadingPetalDrift 3.5s ease-in-out var(--t-water-out) forwards;
+}
+@keyframes loadingPetalDrift {
+  0%   { opacity: 0; transform: translateY(-10px) rotate(0deg); }
+  25%  { opacity: 0.75; }
+  100% { opacity: 0.7; transform: translateY(6px) rotate(-12deg); }
+}
+
+/* 贝壳显露层 */
+.loading__shell-wrap {
+  position: relative;
+  z-index: 5;
+  width: 110px; height: 110px;
+  margin: 0 auto 1.8rem;
+  opacity: 0;
+}
+.loading__shell-glow {
+  position: absolute;
+  inset: -30%;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(240,218,218,0.6) 0%, transparent 65%);
+  opacity: 0;
+  filter: blur(8px);
+}
+.loading.is-animating .loading__shell-glow {
+  animation: loadingGlowAppear 1.2s ease-out var(--t-shell) forwards;
+}
+@keyframes loadingGlowAppear {
+  from { opacity: 0; transform: scale(0.6); }
+  to   { opacity: 1; transform: scale(1); }
+}
+.loading__shell {
+  width: 100%; height: 100%;
+  transform-origin: center 70%;
+  transform: scale(0.4) rotate(-6deg);
+}
+.loading.is-animating .loading__shell {
+  animation: loadingShellReveal 1.0s cubic-bezier(0.22, 1, 0.36, 1) var(--t-shell) forwards;
+}
+@keyframes loadingShellReveal {
+  0%   { transform: scale(0.4) rotate(-6deg); opacity: 0; }
+  60%  { opacity: 1; }
+  100% { transform: scale(1) rotate(3deg); opacity: 1; }
+}
+/* 珠光高光扫过 */
+.loading__shell-shine {
+  transform: translateX(-20px);
+  opacity: 0;
+}
+.loading.is-animating .loading__shell-shine {
+  animation: loadingShineSweep 1.4s ease-in-out calc(var(--t-shell) + 0.3s) forwards;
+}
+@keyframes loadingShineSweep {
+  0%   { transform: translateX(-24px); opacity: 0; }
+  30%  { opacity: 0.55; }
+  70%  { opacity: 0.45; }
+  100% { transform: translateX(28px); opacity: 0; }
+}
+
+/* 文字层 */
+.loading__text-wrap {
+  position: relative;
+  z-index: 5;
+}
+.loading__text-main {
+  font-family: var(--handwrite);
+  font-size: 1.8rem;
+  color: var(--deep-green);
+  margin-bottom: 0.5rem;
+  opacity: 0;
+  transform: translateY(8px);
+}
+.loading.is-animating .loading__text-main {
+  animation: loadingTextFade 0.7s ease-out var(--t-text) forwards;
+}
+.loading__text-sub {
+  font-family: var(--serif-cn);
+  font-size: 0.95rem;
+  color: var(--text-soft);
+  opacity: 0;
+  transform: translateY(6px);
+}
+.loading.is-animating .loading__text-sub {
+  animation: loadingTextFade 0.7s ease-out calc(var(--t-text) + 0.25s) forwards;
+}
+@keyframes loadingTextFade {
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* 退出态：强制停止所有动画，防止残留到 result */
+.loading.is-exiting .loading__bg,
+.loading.is-exiting .loading__water-surface,
+.loading.is-exiting .loading__sand,
+.loading.is-exiting .loading__grain,
+.loading.is-exiting .loading__starfish,
+.loading.is-exiting .loading__petal,
+.loading.is-exiting .loading__shell,
+.loading.is-exiting .loading__shell-glow,
+.loading.is-exiting .loading__shell-shine,
+.loading.is-exiting .loading__text-main,
+.loading.is-exiting .loading__text-sub {
+  animation: none !important;
+  opacity: 0 !important;
+}
+
+/* ============ Result 结果页 ============ */
+.result {
+  text-align: center;
+  position: relative;
+}
+.result__eyebrow {
+  font-family: var(--serif-en);
+  font-style: italic;
+  font-size: 0.85rem;
+  letter-spacing: 0.3em;
+  color: var(--text-faint);
+  margin-bottom: 1.2rem;
+}
+
+/* 贝壳角色标本卡 */
+.result__card {
+  width: min(100%, 420px);
+  margin: 0 auto 2rem;
+  background: var(--shell-white);
+  border: 1px solid var(--line-soft);
+  border-radius: var(--radius-lg);
+  padding: 2.5rem 2rem 2rem;
+  box-shadow: var(--shadow-shell);
+  position: relative;
+}
+.result__card::before {
+  content: "";
+  position: absolute;
+  top: 1rem; right: 1rem;
+  width: 28px; height: 28px;
+  background: var(--pearl-pink);
+  border-radius: 50%;
+  opacity: 0.5;
+}
+.result__shell-icon {
+  width: 80px; height: 80px;
+  margin: 0 auto 1.2rem;
+  color: var(--accent-coral);
+}
+.result__role {
+  font-family: var(--handwrite);
+  font-size: 2rem;
+  color: var(--deep-green);
+  margin-bottom: 0.6rem;
+}
+.result__role-en {
+  font-family: var(--serif-en);
+  font-style: italic;
+  font-size: 0.9rem;
+  color: var(--text-faint);
+  letter-spacing: 0.15em;
+  margin-bottom: 1.2rem;
+}
+.result__desc {
+  font-family: var(--serif-cn);
+  font-size: 0.95rem;
+  color: var(--text-soft);
+  line-height: 1.8;
+  padding-top: 1rem;
+  border-top: 1px dashed var(--line-soft);
+}
+
+.result__suggest {
+  font-family: var(--serif-cn);
+  font-size: 0.98rem;
+  color: var(--text-soft);
+  line-height: 1.8;
+  max-width: 480px;
+  margin: 0 auto 2rem;
+}
+
+.result__actions {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+/* 角色编号（标本标签感） */
+.result__role-number {
+  display: inline-block;
+  font-family: var(--serif-en);
+  font-size: 0.75rem;
+  letter-spacing: 0.2em;
+  color: var(--accent-coral);
+  background: var(--pearl-pink);
+  padding: 0.2rem 0.6rem;
+  border-radius: 999px;
+  margin-bottom: 0.8rem;
+}
+
+/* "你今天捡到的是" 引导文案 */
+.result__pick {
+  font-family: var(--serif-cn);
+  font-size: 0.85rem;
+  color: var(--text-faint);
+  letter-spacing: 0.1em;
+  margin-bottom: 0.3rem;
+}
+
+/* 角色金句 */
+.result__quote {
+  font-family: var(--serif-cn);
+  font-size: 1.05rem;
+  font-style: italic;
+  color: var(--deep-green);
+  line-height: 1.7;
+  margin: 0.8rem 0 1rem;
+  padding: 0.8rem 1rem;
+  background: linear-gradient(135deg, rgba(240,218,218,0.35), rgba(216,235,234,0.35));
+  border-radius: var(--radius-md);
+  border-left: 3px solid var(--role-color, var(--shell-pink));
+}
+
+/* 角色标签 */
+.result__tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  justify-content: center;
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px dashed var(--line-soft);
+}
+.result__tag {
+  font-family: var(--serif-cn);
+  font-size: 0.78rem;
+  color: var(--text-soft);
+  background: var(--cream-white);
+  padding: 0.25rem 0.7rem;
+  border-radius: 999px;
+  border: 1px solid var(--line-soft);
+}
+
+/* ============ Result 纵向手账式三区块 ============ */
+.result__scroll {
+  width: min(100%, 640px);
+  margin: 0 auto;
+  padding: 1rem 1.5rem 4rem;
+  text-align: center;
+}
+.result__block {
+  margin-bottom: 4rem;
+}
+.result__block--role {
+  margin-top: 0.5rem;
+}
+.result__block--top3 {
+  text-align: left;
+}
+
+/* 区块标签 */
+.result__section-label {
+  font-family: var(--serif-en);
+  font-style: italic;
+  font-size: 0.78rem;
+  letter-spacing: 0.3em;
+  color: var(--accent-coral);
+  margin-bottom: 0.6rem;
+  text-align: center;
+}
+.result__section-title {
+  font-family: var(--serif-cn);
+  font-weight: 500;
+  font-size: 1.1rem;
+  color: var(--deep-green);
+  text-align: center;
+  margin-bottom: 1.2rem;
+}
+.result__block--top3 .result__suggest {
+  text-align: center;
+  font-size: 0.9rem;
+  margin-bottom: 1.8rem;
+}
+
+/* ---------- 明信片卡片 ---------- */
+.result__top3 {
+  display: flex;
+  flex-direction: column;
+  gap: 1.4rem;
+}
+.postcard {
+  background: var(--shell-white);
+  border: 1px solid var(--line-soft);
+  border-radius: var(--radius-lg);
+  padding: 1.4rem 1.3rem 1.2rem;
+  box-shadow: 0 2px 12px rgba(39, 69, 63, 0.06);
+  position: relative;
+  overflow: hidden;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+.postcard::before {
+  content: "";
+  position: absolute;
+  top: 0; left: 0;
+  width: 4px; height: 100%;
+  background: linear-gradient(180deg, var(--accent-pink), var(--sea-blue));
+  opacity: 0.4;
+}
+.postcard:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 6px 20px rgba(39, 69, 63, 0.1);
+}
+.postcard__head {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  margin-bottom: 0.7rem;
+}
+.postcard__num {
+  font-family: var(--serif-en);
+  font-size: 0.7rem;
+  letter-spacing: 0.15em;
+  color: var(--shell-white);
+  background: var(--deep-green);
+  padding: 0.15rem 0.5rem;
+  border-radius: 3px;
+}
+.postcard__layer {
+  font-family: var(--serif-cn);
+  font-size: 0.72rem;
+  color: var(--text-faint);
+  background: var(--cream-white);
+  padding: 0.15rem 0.5rem;
+  border-radius: 3px;
+}
+.postcard__title {
+  font-family: var(--serif-cn);
+  font-weight: 600;
+  font-size: 1.05rem;
+  color: var(--deep-green);
+  margin-bottom: 0.8rem;
+  line-height: 1.5;
+}
+.postcard__fit {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.8rem;
+}
+.postcard__fit-label {
+  font-size: 0.72rem;
+  color: var(--text-faint);
+  white-space: nowrap;
+}
+.postcard__fit-value {
+  font-family: var(--serif-en);
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: var(--accent-coral);
+  white-space: nowrap;
+}
+.postcard__fit-bar {
+  flex: 1;
+  height: 4px;
+  background: var(--cream-white);
+  border-radius: 999px;
+  overflow: hidden;
+}
+.postcard__fit-fill {
+  display: block;
+  height: 100%;
+  background: linear-gradient(90deg, var(--shell-pink), var(--sea-blue));
+  border-radius: 999px;
+}
+.postcard__tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin-bottom: 0.8rem;
+}
+.postcard__tag {
+  font-size: 0.72rem;
+  color: var(--text-soft);
+  background: rgba(240, 218, 218, 0.35);
+  padding: 0.15rem 0.5rem;
+  border-radius: 3px;
+}
+.postcard__reason {
+  font-family: var(--serif-cn);
+  font-size: 0.9rem;
+  color: var(--text-soft);
+  line-height: 1.7;
+  padding: 0.7rem 0.8rem;
+  background: linear-gradient(135deg, rgba(247,243,239,0.6), rgba(216,235,234,0.3));
+  border-radius: var(--radius-sm);
+  border-left: 2px solid var(--sea-blue);
+  margin-bottom: 0.6rem;
+}
+.postcard__addr {
+  font-size: 0.75rem;
+  color: var(--text-faint);
+  line-height: 1.5;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.postcard__collect {
+  display: block;
+  width: 100%;
+  margin-top: 0.8rem;
+  padding: 0.5rem 0.8rem;
+  font-size: 0.78rem;
+  color: var(--wood-600, #6B4F35);
+  background: transparent;
+  border: 1px dashed rgba(107,79,53,0.35);
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+.postcard__collect:hover {
+  background: rgba(107,79,53,0.06);
+  border-style: solid;
+}
+.postcard__collect.is-saved {
+  color: #fff;
+  background: var(--wood-500, #8B6A3A);
+  border-style: solid;
+}
+.postcard__posts {
+  margin-top: 0.9rem;
+  padding-top: 0.7rem;
+  border-top: 1px dashed rgba(156,123,82,0.25);
+}
+.postcard__posts-head {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--wood-600, #6B4F35);
+  margin-bottom: 0.5rem;
+}
+.postcard__posts-more {
+  display: block;
+  text-align: center;
+  margin-top: 0.5rem;
+  font-size: 0.72rem;
+  color: var(--wood-500, #8B6A3A);
+  text-decoration: none;
+}
+.postcard__posts-more:hover { text-decoration: underline; }
+
+/* ---------- 分享卡入口 ---------- */
+.result__block--share {
+  text-align: center;
+}
+.result__share-entry {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.8rem;
+  padding: 1rem 1.5rem;
+  background: rgba(240, 218, 218, 0.3);
+  border: 1px dashed var(--line-soft);
+  border-radius: var(--radius-md);
+}
+.result__share-icon {
+  width: 28px; height: 28px;
+  color: var(--accent-coral);
+  opacity: 0.7;
+}
+.result__share-title {
+  font-family: var(--serif-cn);
+  font-size: 0.9rem;
+  color: var(--text-soft);
+  text-align: left;
+}
+.result__share-sub {
+  font-size: 0.75rem;
+  color: var(--text-faint);
+  text-align: left;
+}
+
+.result__empty {
+  text-align: center;
+  color: var(--text-faint);
+  font-size: 0.9rem;
+  padding: 2rem 0;
+}
+
+/* ============ Dev 状态切换器 ============ */
+.dev-switcher {
+  position: fixed;
+  bottom: 16px; right: 16px;
+  z-index: 999;
+  background: rgba(247, 243, 239, 0.95);
+  backdrop-filter: blur(6px);
+  border: 1px solid var(--line-soft);
+  border-radius: var(--radius-md);
+  padding: 0.6rem 0.8rem;
+  box-shadow: var(--shadow-paper);
+  display: flex;
+  gap: 0.4rem;
+  align-items: center;
+}
+.dev-switcher__label {
+  font-size: 0.68rem;
+  color: var(--text-faint);
+  letter-spacing: 0.1em;
+  margin-right: 0.3rem;
+}
+.dev-switcher button {
+  width: 28px; height: 28px;
+  font-size: 0.78rem;
+  font-family: var(--serif-en);
+  border: 1px solid var(--line-soft);
+  border-radius: 50%;
+  background: var(--shell-white);
+  color: var(--text-soft);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.dev-switcher button:hover { border-color: var(--accent-pink); color: var(--deep-green); }
+.dev-switcher button.is-active {
+  background: var(--deep-green);
+  color: var(--shell-white);
+  border-color: var(--deep-green);
+}
+
+/* ============ Dev 角色测试面板 ============ */
+.dev-roles {
+  position: fixed;
+  bottom: 16px; left: 16px;
+  z-index: 999;
+  background: rgba(247, 243, 239, 0.95);
+  backdrop-filter: blur(6px);
+  border: 1px solid var(--line-soft);
+  border-radius: var(--radius-md);
+  padding: 0.6rem 0.8rem;
+  box-shadow: var(--shadow-paper);
+  display: flex;
+  gap: 0.4rem;
+  align-items: center;
+  flex-wrap: wrap;
+  max-width: 60vw;
+}
+.dev-roles__label {
+  font-size: 0.68rem;
+  color: var(--text-faint);
+  letter-spacing: 0.1em;
+  margin-right: 0.3rem;
+  white-space: nowrap;
+}
+.dev-roles button {
+  font-size: 0.75rem;
+  font-family: var(--serif-cn);
+  border: 1px solid var(--line-soft);
+  border-radius: var(--radius-sm);
+  background: var(--shell-white);
+  color: var(--text-soft);
+  cursor: pointer;
+  transition: all 0.2s;
+  padding: 0.3rem 0.55rem;
+  white-space: nowrap;
+}
+.dev-roles button:hover {
+  border-color: var(--accent-pink);
+  color: var(--deep-green);
+  background: var(--pearl-pink);
+}
+
+/* ============ 分享卡（1080×1440，供 html-to-image 导出 PNG） ============ */
+/* 隐藏容器：移出视口但保持可渲染，导出时 html-to-image 会克隆节点 */
+.share-card-wrap {
+  position: fixed;
+  left: -99999px;
+  top: 0;
+  width: 1080px;
+  height: 1440px;
+  z-index: -9999;
+  pointer-events: none;
+  opacity: 0;
+}
+
+.share-card {
+  position: relative;
+  width: 1080px;
+  height: 1440px;
+  overflow: hidden;
+  background: #F7F3EF;
+  font-family: "Jost", "PingFang SC", sans-serif;
+  color: #3F4138;
+}
+
+/* 背景材质层：贝母白 + 珠光 + 极细沙粒 */
+.share-card__bg {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(ellipse 80% 60% at 25% 15%, rgba(255,255,255,0.6) 0%, rgba(255,255,255,0) 50%),
+    radial-gradient(ellipse 60% 50% at 80% 85%, rgba(232,224,237,0.35) 0%, rgba(232,224,237,0) 55%),
+    radial-gradient(ellipse 50% 40% at 15% 80%, rgba(216,235,234,0.3) 0%, rgba(216,235,234,0) 60%),
+    #F7F3EF;
+}
+/* 极细沙粒纹理（SVG turbulence data URI） */
+.share-card__bg::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+  opacity: 0.5;
+  mix-blend-mode: multiply;
+}
+
+/* 装饰元素：少量粉色贝壳、海星、花瓣、海浪光纹 */
+.share-card__decor {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+.decor {
+  position: absolute;
+  display: block;
+  opacity: 0.55;
+}
+.decor--shell-1 {
+  width: 56px; height: 56px;
+  top: 70px; right: 80px;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 56 56'%3E%3Cpath d='M28 6 C 14 6 6 18 6 30 C 6 42 16 50 28 50 C 40 50 50 42 50 30 C 50 18 42 6 28 6 Z' fill='%23E7BBB9' opacity='0.6'/%3E%3Cpath d='M28 14 L28 44' stroke='%23DFA69F' stroke-width='0.8'/%3E%3C/svg%3E") no-repeat center/contain;
+  transform: rotate(15deg);
+}
+.decor--shell-2 {
+  width: 44px; height: 44px;
+  bottom: 280px; left: 70px;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 44 44'%3E%3Cpath d='M22 4 C 10 4 4 14 4 24 C 4 34 12 40 22 40 C 32 40 40 34 40 24 C 40 14 34 4 22 4 Z' fill='%23F0DADA' opacity='0.7'/%3E%3C/svg%3E") no-repeat center/contain;
+  transform: rotate(-20deg);
+}
+.decor--starfish {
+  width: 52px; height: 52px;
+  top: 420px; left: 60px;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 52 52'%3E%3Cpath d='M26 4 L31 20 L48 20 L34 30 L39 46 L26 36 L13 46 L18 30 L4 20 L21 20 Z' fill='%23DFA69F' opacity='0.5'/%3E%3C/svg%3E") no-repeat center/contain;
+}
+.decor--petal-1 {
+  width: 36px; height: 44px;
+  top: 180px; left: 90px;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 36 44'%3E%3Cellipse cx='18' cy='22' rx='14' ry='20' fill='%23E7BBB9' opacity='0.45'/%3E%3C/svg%3E") no-repeat center/contain;
+  transform: rotate(-30deg);
+}
+.decor--petal-2 {
+  width: 30px; height: 38px;
+  bottom: 340px; right: 85px;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 38'%3E%3Cellipse cx='15' cy='19' rx='12' ry='17' fill='%23F0DADA' opacity='0.55'/%3E%3C/svg%3E") no-repeat center/contain;
+  transform: rotate(25deg);
+}
+.decor--wave {
+  width: 220px; height: 80px;
+  bottom: 0; left: 50%;
+  transform: translateX(-50%);
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 220 80' preserveAspectRatio='none'%3E%3Cpath d='M0 50 Q 55 20 110 50 T 220 50 L 220 80 L 0 80 Z' fill='%23D8EBEA' opacity='0.4'/%3E%3Cpath d='M0 60 Q 55 35 110 60 T 220 60' stroke='%239CCECE' stroke-width='1' fill='none' opacity='0.5'/%3E%3C/svg%3E") no-repeat center/contain;
+}
+
+/* 内容层 */
+.share-card__content {
+  position: relative;
+  z-index: 2;
+  width: 100%;
+  height: 100%;
+  padding: 70px 70px 60px;
+  display: flex;
+  flex-direction: column;
+}
+
+/* 顶部标识 */
+.share-card__header {
+  text-align: center;
+  margin-bottom: 24px;
+}
+.share-card__eyebrow {
+  font-family: "Cormorant Garamond", Georgia, serif;
+  font-size: 26px;
+  font-weight: 500;
+  letter-spacing: 6px;
+  color: #27453F;
+  text-transform: uppercase;
+}
+.share-card__sub {
+  font-size: 14px;
+  letter-spacing: 4px;
+  color: #9A9A8E;
+  margin-top: 8px;
+  text-transform: uppercase;
+}
+
+/* 贝壳视觉（视觉中心） */
+.share-card__visual {
+  width: 320px;
+  height: 320px;
+  margin: 16px auto 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  filter: drop-shadow(0 8px 24px rgba(63,65,56,0.12));
+}
+.share-card__visual svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+/* 角色信息 */
+.share-card__role {
+  text-align: center;
+  margin-bottom: 28px;
+}
+.share-card__role-name {
+  font-family: "Ma Shan Zheng", "STKaiti", "KaiTi", serif;
+  font-size: 62px;
+  font-weight: 400;
+  letter-spacing: 12px;
+  color: #27453F;
+  margin-bottom: 6px;
+  padding-left: 12px; /* 补偿字间距视觉偏移 */
+}
+.share-card__role-en {
+  font-family: "Cormorant Garamond", Georgia, serif;
+  font-size: 22px;
+  font-weight: 400;
+  letter-spacing: 8px;
+  color: #6E6E62;
+  text-transform: uppercase;
+  margin-bottom: 18px;
+}
+.share-card__quote {
+  font-family: "Ma Shan Zheng", "STKaiti", "KaiTi", serif;
+  font-size: 30px;
+  color: #3F4138;
+  line-height: 1.4;
+  margin-bottom: 14px;
+}
+.share-card__tags {
+  font-size: 15px;
+  letter-spacing: 1px;
+  color: #9A9A8E;
+  line-height: 1.6;
+}
+
+/* TOP3 推荐 */
+.share-card__top3 {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  margin: 10px 0;
+}
+.share-card__section-label {
+  font-family: "Cormorant Garamond", Georgia, serif;
+  font-size: 20px;
+  font-weight: 500;
+  letter-spacing: 5px;
+  color: #27453F;
+  text-transform: uppercase;
+  text-align: center;
+  margin-bottom: 24px;
+  position: relative;
+}
+.share-card__section-label::before,
+.share-card__section-label::after {
+  content: "";
+  display: inline-block;
+  width: 50px;
+  height: 1px;
+  background: rgba(63,65,56,0.2);
+  vertical-align: middle;
+  margin: 0 18px;
+}
+.share-card__top3-list {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+.share-card__top3-item {
+  display: flex;
+  align-items: baseline;
+  gap: 16px;
+  padding: 14px 20px;
+  background: rgba(255,255,255,0.4);
+  border-radius: 6px;
+  border-left: 3px solid #E7BBB9;
+}
+.share-card__top3-num {
+  font-family: "Cormorant Garamond", Georgia, serif;
+  font-size: 26px;
+  font-weight: 500;
+  color: #DFA69F;
+  min-width: 40px;
+}
+.share-card__top3-name {
+  flex: 1;
+  font-family: "Noto Serif SC", "Songti SC", serif;
+  font-size: 20px;
+  font-weight: 500;
+  color: #3F4138;
+}
+.share-card__top3-fit {
+  font-family: "Jost", sans-serif;
+  font-size: 18px;
+  font-weight: 400;
+  color: #9CCECE;
+  letter-spacing: 1px;
+}
+
+/* 底部 */
+.share-card__footer {
+  text-align: center;
+  margin-top: auto;
+  padding-top: 20px;
+}
+.share-card__date-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  margin-bottom: 18px;
+  font-family: "Jost", sans-serif;
+  font-size: 15px;
+  letter-spacing: 2px;
+  color: #6E6E62;
+}
+.share-card__weather {
+  color: #9CCECE;
+}
+.share-card__brand {
+  border-top: 1px solid rgba(63,65,56,0.12);
+  padding-top: 18px;
+}
+.share-card__brand-cn {
+  font-family: "Noto Serif SC", "Songti SC", serif;
+  font-size: 17px;
+  font-weight: 500;
+  letter-spacing: 4px;
+  color: #27453F;
+  margin-bottom: 4px;
+}
+.share-card__brand-en {
+  font-size: 12px;
+  letter-spacing: 3px;
+  color: #9A9A8E;
+  margin-bottom: 12px;
+}
+.share-card__cta {
+  font-family: "Ma Shan Zheng", "STKaiti", "KaiTi", serif;
+  font-size: 22px;
+  color: #DFA69F;
+  letter-spacing: 2px;
+}
+
+/* ============ 响应式 ============ */
+@media (max-width: 768px) {
+  .today-container { padding-block: 1.5rem; }
+  .today-stage { min-height: calc(100vh - 100px); padding-block: 1rem 5rem; }
+  .intro__title { font-size: 2.4rem; }
+  .quiz__question { font-size: 1.7rem; }
+  .quiz__option { padding: 0.9rem 1rem; font-size: 0.92rem; }
+  /* 6 选项在小屏改单列，避免拥挤 */
+  .quiz__options--grid { grid-template-columns: 1fr; }
+  .result__card { padding: 2rem 1.4rem 1.6rem; }
+  .result__role { font-size: 1.7rem; }
+  .dev-switcher { bottom: 12px; right: 12px; padding: 0.5rem 0.6rem; }
+  .dev-roles { bottom: 12px; left: 12px; max-width: 55vw; padding: 0.4rem 0.5rem; }
+  .dev-roles button { font-size: 0.7rem; padding: 0.25rem 0.4rem; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+}
+
+/* ============================================
+   桌面端 / 平板端响应式布局（mobile-first 渐进增强）
+   断点：tablet ≥769 / desktop ≥1100 / large ≥1440
+   移动端（<769）保持原有单列逻辑不变
+   ============================================ */
+
+/* ---------- 新增 wrapper 基础样式（移动端单列） ---------- */
+.intro__layout {
+  display: flex;
+  flex-direction: column;
+}
+/* 移动端：视觉区正常显示贝壳 + 装饰，桌面专属装饰隐藏 */
+.intro__visual {
+  position: relative;
+  text-align: center;
+  margin-bottom: 1.5rem;
+}
+.intro__visual-sand,
+.intro__visual-pearl,
+.intro__visual-sun {
+  display: none; /* 仅桌面端显示 */
+}
+.intro__content {
+  text-align: center;
+}
+.intro__lead { max-width: 480px; margin-inline: auto; }
+
+/* Quiz 布局 wrapper：移动端正常流，视觉区隐藏 */
+.quiz__layout {
+  display: flex;
+  flex-direction: column;
+}
+.quiz__visual {
+  display: none; /* 移动端隐藏 */
+}
+.quiz__main { width: 100%; }
+
+/* Result 布局 wrapper：移动端单列 */
+.result__layout {
+  display: flex;
+  flex-direction: column;
+}
+.result__col { width: 100%; }
+
+/* ============================================
+   Tablet：769px–1099px 适度扩展
+   ============================================ */
+@media (min-width: 769px) {
+  .today-container { width: min(90%, 960px); }
+  .quiz-width { max-width: 620px; }
+  .result__scroll { max-width: 720px; }
+  .result__card { max-width: 380px; }
+  .result__top3 { gap: 1.1rem; }
+}
+
+/* ============================================
+   Desktop：≥1100px 真正的桌面网页布局
+   ============================================ */
+@media (min-width: 1100px) {
+  /* ---------- 整体容器与安全边距 ---------- */
+  .today-container {
+    width: min(88%, 1280px);
+    padding-block: 3rem;
+  }
+  .today-stage {
+    min-height: calc(100vh - 140px);
+    align-items: flex-start;
+    padding-block: 3rem 5rem;
+  }
+
+  /* ---------- Intro 左右分栏（45% 视觉 / 55% 文字） ---------- */
+  .intro { text-align: left; }
+  .intro__layout {
+    display: grid;
+    grid-template-columns: 45% 55%;
+    gap: 4rem;
+    align-items: center;
+    min-height: 70vh;
+  }
+  .intro__visual {
+    display: block;
+    text-align: center;
+    margin-bottom: 0;
+    position: relative;
+    min-height: 420px;
+  }
+  .intro__visual .intro__shell {
+    width: 180px; height: 180px;
+    margin: 0 auto;
+    animation: float 7s ease-in-out infinite;
+  }
+  .intro__visual .intro__ripples {
+    top: 40%; width: 320px; height: 140px;
+  }
+  /* 桌面专属装饰：白沙底纹 */
+  .intro__visual-sand {
+    display: block;
+    position: absolute;
+    bottom: 10%; left: 50%;
+    transform: translateX(-50%);
+    width: 80%; height: 60px;
+    background: radial-gradient(ellipse at center, var(--warm-sand) 0%, transparent 70%);
+    opacity: 0.4;
+    filter: blur(8px);
+  }
+  /* 桌面专属装饰：小珍珠 */
+  .intro__visual-pearl {
+    display: block;
+    position: absolute;
+    width: 10px; height: 10px;
+    background: radial-gradient(circle at 30% 30%, #fff, var(--pearl-pink));
+    border-radius: 50%;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+  }
+  .intro__visual-pearl--1 { top: 25%; right: 15%; }
+  .intro__visual-pearl--2 { bottom: 30%; left: 18%; }
+  /* 桌面专属装饰：阳光高光 */
+  .intro__visual-sun {
+    display: block;
+    position: absolute;
+    top: 5%; right: 10%;
+    width: 80px; height: 80px;
+    background: radial-gradient(circle, rgba(240,218,218,0.5) 0%, transparent 70%);
+    border-radius: 50%;
+    filter: blur(10px);
+  }
+  /* 装饰位置调整为 editorial 错位 */
+  .intro__visual .intro__deco-star {
+    bottom: 15%; right: 8%;
+    width: 32px; height: 32px;
+  }
+  .intro__visual .intro__deco-petal {
+    bottom: 25%; left: 10%;
+    width: 24px; height: 24px;
+  }
+  .intro__content {
+    text-align: left;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  .intro__title {
+    font-size: clamp(3rem, 4.5vw, 4.2rem);
+  }
+  .intro__lead {
+    max-width: 420px;
+    margin: 0 0 2.4rem;
+  }
+
+  /* ---------- Quiz 左右分栏（40% 视觉 / 60% 题目） ---------- */
+  .quiz-stage {
+    padding-inline: 2rem;
+  }
+  .quiz__layout {
+    display: grid;
+    grid-template-columns: 40% 60%;
+    gap: 3.5rem;
+    align-items: start;
+    min-height: 60vh;
+  }
+  .quiz__visual {
+    display: block;
+    position: sticky;
+    top: 2rem;
+    min-height: 360px;
+    padding: 2rem;
+  }
+  /* 题型场景：默认隐藏所有，仅显示匹配题型 */
+  .qv-scene { display: none; position: relative; width: 100%; height: 280px; }
+  .qv-scene--energy .qv-sun,
+  .qv-scene--energy .qv-shell--lg,
+  .qv-scene--energy .qv-shell--sm { display: block; }
+  .qv-scene--crowd .qv-shell-row { display: flex; }
+  .qv-scene--sun .qv-water-surface { display: block; }
+  .qv-scene--activity .qv-wave,
+  .qv-scene--activity .qv-starfish { display: block; }
+  .qv-scene--companion .qv-shell--lg { display: block; }
+  .qv-scene--emotion .qv-flower,
+  .qv-scene--emotion .qv-pearl,
+  .qv-scene--emotion .qv-shell--pearl { display: block; }
+
+  /* 通过 quiz-stage--{type} 父级控制显示 */
+  .quiz-stage--energy .qv-scene--energy,
+  .quiz-stage--crowd .qv-scene--crowd,
+  .quiz-stage--sun .qv-scene--sun,
+  .quiz-stage--activity .qv-scene--activity,
+  .quiz-stage--companion .qv-scene--companion,
+  .quiz-stage--emotion .qv-scene--emotion { display: block; }
+
+  /* 视觉场景元素样式 */
+  .qv-sun {
+    width: 100px; height: 100px;
+    background: radial-gradient(circle, rgba(240,218,218,0.6) 0%, transparent 70%);
+    border-radius: 50%;
+    position: absolute;
+    top: 10%; left: 50%;
+    transform: translateX(-50%);
+    filter: blur(6px);
+  }
+  .qv-shell {
+    width: 80px; height: 80px;
+    background: linear-gradient(135deg, #F7F3EF, #F0DADA, #E7BBB9);
+    border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+    position: absolute;
+    box-shadow: 0 4px 12px rgba(223,166,159,0.2);
+  }
+  .qv-shell--lg { width: 100px; height: 100px; bottom: 15%; left: 30%; }
+  .qv-shell--sm { width: 60px; height: 60px; bottom: 25%; right: 25%; }
+  .qv-shell--offset { left: 55%; bottom: 18%; }
+  .qv-shell--pearl {
+    background: linear-gradient(135deg, #F7F3EF, #E8E0ED);
+    width: 90px; height: 90px;
+    bottom: 20%; right: 20%;
+  }
+  .qv-shell-row {
+    display: none;
+    gap: 0.8rem;
+    justify-content: center;
+    position: absolute;
+    bottom: 20%; left: 0; right: 0;
+  }
+  .qv-shell-row span {
+    width: 40px; height: 40px;
+    background: linear-gradient(135deg, #F7F3EF, #E7BBB9);
+    border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+    box-shadow: 0 2px 6px rgba(223,166,159,0.15);
+  }
+  .qv-water-surface {
+    display: none;
+    position: absolute;
+    top: 30%; left: 0; right: 0;
+    height: 120px;
+    background: linear-gradient(180deg, transparent, rgba(216,235,234,0.4), transparent);
+  }
+  .qv-wave {
+    display: none;
+    position: absolute;
+    bottom: 15%; left: 0; right: 0;
+    height: 40px;
+    background: repeating-linear-gradient(90deg, transparent, transparent 30px, rgba(156,206,206,0.3) 30px, rgba(156,206,206,0.3) 60px);
+    border-radius: 50%;
+  }
+  .qv-wave--2 { bottom: 25%; opacity: 0.6; }
+  .qv-starfish {
+    display: none;
+    position: absolute;
+    top: 25%; right: 20%;
+    width: 50px; height: 50px;
+  }
+  .qv-starfish svg { width: 100%; height: 100%; }
+  .qv-flower {
+    display: none;
+    position: absolute;
+    top: 20%; left: 30%;
+    width: 60px; height: 60px;
+  }
+  .qv-flower svg { width: 100%; height: 100%; }
+  .qv-pearl {
+    display: none;
+    position: absolute;
+    top: 35%; right: 30%;
+    width: 30px; height: 30px;
+    background: radial-gradient(circle at 30% 30%, #fff, var(--pearl-pink));
+    border-radius: 50%;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+  }
+
+  /* 题目区宽度放开 */
+  .quiz__main { width: 100%; max-width: 100%; }
+  .quiz__body { justify-content: flex-start; }
+  .quiz__question { text-align: left; font-size: 2.2rem; }
+
+  /* ---------- 答案卡网格（桌面端） ---------- */
+  /* 4 个答案：2 × 2 */
+  .quiz__options {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(220px, 280px));
+    gap: 1rem;
+    justify-content: start;
+  }
+  /* 6 个答案：3 × 2（JS 已加 --grid 类，这里直接覆盖） */
+  .quiz__options--grid {
+    grid-template-columns: repeat(3, minmax(220px, 260px));
+  }
+  .quiz__option {
+    min-height: auto;
+  }
+
+  /* ---------- Quiz 信息层级：进度用小珍珠点 ---------- */
+  .quiz__progress { max-width: 240px; }
+  .quiz__progress-bar { height: 1px; }
+
+  /* ---------- Loading 横向布局（左大贝壳 / 右文字） ---------- */
+  .loading {
+    min-height: 70vh;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    gap: 4rem;
+    text-align: left;
+  }
+  .loading__shell-wrap {
+    flex-shrink: 0;
+  }
+  .loading__shell {
+    width: 200px; height: 200px;
+  }
+  .loading__text-wrap {
+    max-width: 360px;
+  }
+  .loading__text-main {
+    font-size: 2.4rem;
+  }
+
+  /* ---------- Result 双栏（左 44% 角色 / 右 56% TOP3） ---------- */
+  .result__scroll {
+    width: min(100%, 1200px);
+    text-align: left;
+    padding-inline: 2rem;
+  }
+  .result__layout {
+    display: grid;
+    grid-template-columns: 44% 56%;
+    gap: 4rem;
+    align-items: start;
+  }
+  .result__col { width: 100%; }
+  .result__col--left { position: sticky; top: 2rem; }
+  .result__card {
+    width: 100%;
+    max-width: 400px;
+    margin: 0;
+    padding: 2.5rem 2.2rem 2rem;
+  }
+  .result__eyebrow { text-align: left; }
+  .result__tags { justify-content: flex-start; }
+  .result__col--right .result__section-label { text-align: left; }
+  .result__col--right .result__section-title { text-align: left; }
+  .result__col--right .result__suggest { text-align: left; margin-inline: 0; }
+
+  /* TOP3 明信片：桌面端纵向 editorial list，卡片略宽 */
+  .result__top3 {
+    gap: 1.2rem;
+  }
+  .postcard {
+    padding: 1.5rem 1.4rem 1.3rem;
+  }
+  .postcard__title { font-size: 1rem; }
+
+  /* 桌面端结果页操作按钮左对齐 */
+  .result__actions { justify-content: flex-start; }
+
+  /* ---------- 分享卡：桌面端作为 preview object，不占主流程 ---------- */
+  .result__block--share {
+    margin-top: 1.5rem;
+  }
+}
+
+/* ============================================
+   Large Desktop：≥1440px 增加留白，不无限拉伸
+   ============================================ */
+@media (min-width: 1440px) {
+  .today-container {
+    width: min(86%, 1360px);
+    padding-block: 4rem;
+  }
+  .intro__layout { gap: 5rem; }
+  .quiz__layout { gap: 4.5rem; }
+  .result__layout { gap: 5rem; }
+  /* 答案卡上限略放宽，保持 editorial 感 */
+  .quiz__options {
+    grid-template-columns: repeat(2, minmax(260px, 300px));
+  }
+  .quiz__options--grid {
+    grid-template-columns: repeat(3, minmax(240px, 280px));
+  }
+}

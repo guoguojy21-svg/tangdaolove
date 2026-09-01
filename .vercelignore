@@ -1,0 +1,20 @@
+# 本地开发服务器（Vercel 不需要）
+server.js
+
+# 构建脚本（Vercel 构建时需要，但不部署到静态输出）
+build.js
+
+# 临时文件
+temp-font.css
+
+# 环境变量（绝不部署）
+.env
+.env.local
+.env.*.local
+
+# 依赖
+node_modules/
+
+# 编辑器
+.vscode/
+.idea/

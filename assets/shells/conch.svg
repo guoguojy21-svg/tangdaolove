@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="200" height="200">
+  <!-- TODO: 海螺 SEA CONCH 正式贝壳素材将由设计替换，当前为优雅矢量占位轮廓 -->
+  <defs>
+    <radialGradient id="conchGrad" cx="45%" cy="35%" r="75%">
+      <stop offset="0%" stop-color="#F0F8F8"/>
+      <stop offset="100%" stop-color="#D8EBEA"/>
+    </radialGradient>
+  </defs>
+  <!-- 螺旋海螺主体 -->
+  <path d="M100 30 C 70 30, 45 55, 45 85 C 45 105, 55 120, 72 128 C 60 135, 52 148, 52 162 C 52 175, 68 182, 82 176 C 95 180, 110 178, 122 170 C 140 158, 150 138, 148 118 C 158 108, 162 92, 158 76 C 152 52, 130 30, 100 30 Z" fill="url(#conchGrad)" stroke="#8FBFBF" stroke-width="1.4"/>
+  <!-- 螺旋线 -->
+  <path d="M100 45 C 80 45, 65 60, 65 80 C 65 95, 74 105, 88 108" stroke="#A8CCCC" stroke-width="1.2" fill="none" opacity="0.7"/>
+  <path d="M100 60 C 88 60, 78 70, 78 82 C 78 92, 85 98, 95 98" stroke="#A8CCCC" stroke-width="1" fill="none" opacity="0.6"/>
+  <!-- 螺口 -->
+  <ellipse cx="118" cy="140" rx="22" ry="16" fill="#F7FBFB" stroke="#8FBFBF" stroke-width="1.2"/>
+  <ellipse cx="118" cy="140" rx="14" ry="10" fill="#E8F3F2" opacity="0.7"/>
+  <!-- 高光 -->
+  <path d="M72 52 Q62 95, 80 125" stroke="#FFFFFF" stroke-width="3" fill="none" opacity="0.5" stroke-linecap="round"/>
+  <circle cx="92" cy="72" r="2.5" fill="#FFFFFF" opacity="0.6"/>
+</svg>

@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>我的躺岛 · 躺岛 TANGDAO</title>
+  <meta name="description" content="收藏地点、收藏帖子、路线板" />
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Jost:wght@300;400;500&family=Noto+Serif+SC:wght@400;600;700&display=swap" rel="stylesheet" />
+
+  <!-- 绝对路径：支持子路由 -->
+  <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml" />
+  <link rel="stylesheet" href="/css/community.css" />
+</head>
+<body class="collection-page">
+
+  <!-- ============ 顶部导航 ============ -->
+  <header class="community-topbar">
+    <a href="/index.html" class="community-topbar__brand">
+      躺岛 TANGDAO
+      <em>陵水慢生活地图</em>
+    </a>
+    <nav class="community-topbar__nav">
+      <a href="/index.html">首页</a>
+      <a href="/map.html">地图</a>
+      <a href="/today.html">今天去哪</a>
+      <a href="/community">岛民漂流帖</a>
+      <a href="/collection" class="is-active">我的躺岛</a>
+    </nav>
+  </header>
+
+  <!-- ============ 主内容 ============ -->
+  <main class="collection-main">
+
+    <!-- 页面标题 -->
+    <div class="page-head">
+      <p class="page-head__eyebrow">My Tangdao</p>
+      <h1 class="page-head__title">我的躺岛</h1>
+      <p class="page-head__sub">收藏喜欢的地方和漂流帖，慢慢规划自己的路线 · 示意内容 Demo</p>
+    </div>
+
+    <!-- Tab 切换 -->
+    <div class="collection-tabs" id="collectionTabs">
+      <button class="collection-tab is-active" data-tab="places">收藏地点</button>
+      <button class="collection-tab" data-tab="posts">收藏帖子</button>
+      <button class="collection-tab" data-tab="board">路线板</button>
+    </div>
+
+    <!-- Tab 内容区 -->
+    <div id="collectionContent">
+      <!-- JS 动态渲染 -->
+      <div class="empty-state">
+        <div class="empty-state__icon">···</div>
+        <p class="empty-state__text">正在整理你的小收藏…</p>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- 页脚 -->
+  <footer class="community-footer">
+    <p>躺岛 TANGDAO · 陵水慢生活地图</p>
+    <p class="community-footer__sub">Demos only · 收藏内容均为示意</p>
+  </footer>
+
+  <!-- JS 绝对路径：先加载仓库，再加载页面逻辑 -->
+  <script src="/js/collection-store.js"></script>
+  <script src="/js/collection.js"></script>
+</body>
+</html>

@@ -1,0 +1,33 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "buildCommand": "node build.js",
+  "outputDirectory": ".",
+  "rewrites": [
+    { "source": "/now/:placeId", "destination": "/now.html" },
+    { "source": "/now", "destination": "/now.html" },
+    { "source": "/community/:postId", "destination": "/community-detail.html" },
+    { "source": "/community", "destination": "/community.html" },
+    { "source": "/collection/board", "destination": "/collection.html" },
+    { "source": "/collection", "destination": "/collection.html" }
+  ],
+  "headers": [
+    {
+      "source": "/assets/(.*)",
+      "headers": [
+        { "key": "Cache-Control", "value": "public, max-age=31536000, immutable" }
+      ]
+    },
+    {
+      "source": "/css/(.*)",
+      "headers": [
+        { "key": "Cache-Control", "value": "public, max-age=86400" }
+      ]
+    },
+    {
+      "source": "/js/(.*)",
+      "headers": [
+        { "key": "Cache-Control", "value": "public, max-age=86400" }
+      ]
+    }
+  ]
+}

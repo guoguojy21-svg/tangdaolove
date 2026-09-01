@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>漂流帖详情 · 躺岛 TANGDAO</title>
+  <meta name="description" content="岛民漂流帖详情" />
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Jost:wght@300;400;500&family=Noto+Serif+SC:wght@400;600;700&display=swap" rel="stylesheet" />
+
+  <!-- 绝对路径：支持子路由 -->
+  <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml" />
+  <link rel="stylesheet" href="/css/community.css" />
+</head>
+<body class="community-page">
+
+  <!-- ============ 顶部导航 ============ -->
+  <header class="community-topbar">
+    <a href="/index.html" class="community-topbar__brand">
+      躺岛 TANGDAO
+      <em>陵水慢生活地图</em>
+    </a>
+    <nav class="community-topbar__nav">
+      <a href="/index.html">首页</a>
+      <a href="/map.html">地图</a>
+      <a href="/today.html">今天去哪</a>
+      <a href="/community" class="is-active">岛民漂流帖</a>
+      <a href="/collection">我的躺岛</a>
+    </nav>
+  </header>
+
+  <!-- ============ 主内容 ============ -->
+  <main class="community-main">
+    <div class="detail-layout">
+
+      <!-- 返回 -->
+      <a href="/community" class="community-topbar__back" style="display:inline-block; margin-bottom:1rem;">← 返回漂流帖</a>
+
+      <!-- 1. 图片 -->
+      <div class="detail-hero" id="detailHero">TANGDAO</div>
+
+      <!-- 2. 标题 / 一句话 -->
+      <div class="detail-header">
+        <h1 class="detail-header__title" id="detailTitle">加载中…</h1>
+      </div>
+
+      <!-- 标签 -->
+      <div class="detail-tags" id="detailTags"></div>
+
+      <!-- 3. 正文 -->
+      <div class="detail-body" id="detailBody">
+        <p>正在听海浪的声音…</p>
+      </div>
+
+      <!-- 4. 作者与时间 -->
+      <div class="detail-author-row">
+        <div class="detail-author-row__avatar" id="detailAvatar">?</div>
+        <div class="detail-author-row__info">
+          <span class="detail-author-row__name" id="detailAuthor">—</span>
+          <span class="detail-author-row__time" id="detailTime">—</span>
+        </div>
+      </div>
+
+      <!-- 5. 关联地点 -->
+      <div class="related-place" id="relatedPlace">
+        <div class="related-place__marker">📍</div>
+        <div class="related-place__body">
+          <p class="related-place__label">关联地点</p>
+          <p class="related-place__name" id="relatedName">—</p>
+          <p class="related-place__category" id="relatedCategory">—</p>
+          <p class="related-place__summary" id="relatedSummary">—</p>
+        </div>
+      </div>
+      <!-- 地点联动按钮 -->
+      <div class="related-place__actions" id="relatedPlaceActions">
+        <a class="place-action-btn place-action-btn--map" id="placeMapBtn" href="/map.html">🗺️ 地图上看看</a>
+        <a class="place-action-btn place-action-btn--now" id="placeNowBtn" href="/now/1">⏱️ 看看这里正在发生什么</a>
+        <button class="place-action-btn place-action-btn--collect" id="placeCollectBtn" type="button">🔖 收藏这个地点</button>
+      </div>
+
+      <!-- 6. 点赞 / 评论 / 收藏 互动栏 -->
+      <div class="detail-actions">
+        <button class="detail-action-btn" id="likeBtn">
+          <span class="detail-action-btn__icon">♡</span>
+          <span class="detail-action-btn__label">点赞</span>
+          <span class="detail-action-btn__count" id="likeCount">0</span>
+        </button>
+        <button class="detail-action-btn" id="commentBtn">
+          <span class="detail-action-btn__icon">💬</span>
+          <span class="detail-action-btn__label">评论</span>
+          <span class="detail-action-btn__count" id="commentCount">0</span>
+        </button>
+        <button class="detail-action-btn" id="saveBtn">
+          <span class="detail-action-btn__icon">🔖</span>
+          <span class="detail-action-btn__label">收藏</span>
+          <span class="detail-action-btn__count" id="saveCount">0</span>
+        </button>
+      </div>
+
+      <!-- 7. 模拟评论 -->
+      <div class="comments-section">
+        <div class="comments-section__head">
+          <h2 class="comments-section__title">岛民留言</h2>
+          <span class="comments-section__demo">示意评论 · Demo Comments</span>
+        </div>
+        <div id="commentList">
+          <p class="comments-empty">正在听海浪的声音…</p>
+        </div>
+      </div>
+
+      <!-- 8. 相关入口：更多关于这个地方的漂流帖 -->
+      <div class="related-posts-section" id="relatedPostsSection">
+        <h2 class="related-posts-section__title">更多关于这个地方的漂流帖</h2>
+        <div class="related-posts-grid" id="relatedPostsGrid">
+          <!-- JS 动态渲染 -->
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+  <!-- 页脚 -->
+  <footer class="community-footer">
+    <p>躺岛 TANGDAO · 陵水慢生活地图</p>
+    <p class="community-footer__sub">Demos only · 社区内容均为示意</p>
+  </footer>
+
+  <!-- JS 绝对路径 -->
+  <script src="/js/collection-store.js"></script>
+  <script src="/js/community.js"></script>
+</body>
+</html>

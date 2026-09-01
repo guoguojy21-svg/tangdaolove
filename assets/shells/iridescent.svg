@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="200" height="200">
+  <!-- TODO: 虹彩贝 IRIDESCENT SHELL 正式贝壳素材将由设计替换，当前为优雅矢量占位轮廓 -->
+  <defs>
+    <linearGradient id="iriGrad" x1="30%" y1="20%" x2="70%" y2="80%">
+      <stop offset="0%" stop-color="#EAF6F5"/>
+      <stop offset="50%" stop-color="#B8E0DE"/>
+      <stop offset="100%" stop-color="#9CCECE"/>
+    </linearGradient>
+    <linearGradient id="iriShine" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FFFFFF" stop-opacity="0.7"/>
+      <stop offset="100%" stop-color="#FFFFFF" stop-opacity="0"/>
+    </linearGradient>
+  </defs>
+  <path d="M100 26 C 64 26, 30 64, 30 108 C 30 150, 60 178, 100 178 C 140 178, 170 150, 170 108 C 170 64, 136 26, 100 26 Z" fill="url(#iriGrad)" stroke="#7FB8B6" stroke-width="1.4"/>
+  <!-- 虹彩光带 -->
+  <path d="M50 70 Q100 50, 150 70" stroke="url(#iriShine)" stroke-width="6" fill="none" opacity="0.5"/>
+  <path d="M40 105 Q100 85, 160 105" stroke="url(#iriShine)" stroke-width="5" fill="none" opacity="0.4"/>
+  <path d="M50 140 Q100 120, 150 140" stroke="url(#iriShine)" stroke-width="4" fill="none" opacity="0.3"/>
+  <!-- 闪光小点 -->
+  <circle cx="72" cy="88" r="2" fill="#FFFFFF" opacity="0.8"/>
+  <circle cx="128" cy="96" r="1.5" fill="#FFFFFF" opacity="0.7"/>
+  <circle cx="96" cy="120" r="1.8" fill="#FFFFFF" opacity="0.6"/>
+  <circle cx="135" cy="130" r="1.2" fill="#FFFFFF" opacity="0.7"/>
+  <path d="M70 44 Q60 90, 78 135" stroke="#FFFFFF" stroke-width="3" fill="none" opacity="0.45" stroke-linecap="round"/>
+</svg>

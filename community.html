@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>岛民漂流帖 · 躺岛 TANGDAO</title>
+  <meta name="description" content="陵水在地分享社区 — 看看岛民今天遇见了什么" />
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Jost:wght@300;400;500&family=Noto+Serif+SC:wght@400;600;700&display=swap" rel="stylesheet" />
+
+  <!-- 绝对路径：支持子路由 -->
+  <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml" />
+  <link rel="stylesheet" href="/css/community.css" />
+</head>
+<body class="community-page">
+
+  <!-- ============ 示意数据角标 ============ -->
+  <div class="demo-badge" aria-label="示意内容">示意内容 · Demo Posts</div>
+
+  <!-- ============ 顶部导航 ============ -->
+  <header class="community-topbar">
+    <a href="/index.html" class="community-topbar__brand">
+      躺岛 TANGDAO
+      <em>陵水慢生活地图</em>
+    </a>
+    <nav class="community-topbar__nav">
+      <a href="/index.html">首页</a>
+      <a href="/map.html">地图</a>
+      <a href="/today.html">今天去哪</a>
+      <a href="/community" class="is-active">岛民漂流帖</a>
+      <a href="/collection">我的躺岛</a>
+    </nav>
+  </header>
+
+  <!-- ============ 主内容 ============ -->
+  <main class="community-main">
+
+    <!-- 页面标题 -->
+    <div class="page-head">
+      <p class="page-head__eyebrow">Drifting Posts</p>
+      <h1 class="page-head__title">岛民漂流帖</h1>
+      <p class="page-head__sub">看看别人今天在陵水遇见了什么。</p>
+    </div>
+
+    <!-- 分类筛选栏 -->
+    <div class="filter-bar" id="filterBar">
+      <button class="filter-chip is-active" data-filter="all">全部</button>
+      <button class="filter-chip" data-filter="推荐">推荐</button>
+      <button class="filter-chip" data-filter="吐槽">吐槽</button>
+      <button class="filter-chip" data-filter="新鲜事">新鲜事</button>
+      <button class="filter-chip" data-filter="海边">海边</button>
+      <button class="filter-chip" data-filter="吃喝">吃喝</button>
+      <button class="filter-chip" data-filter="躺平">躺平</button>
+      <button class="filter-chip" data-filter="夜间">夜间</button>
+      <button class="filter-chip" data-filter="手作">手作</button>
+      <button class="filter-chip" data-filter="城市探索">城市探索</button>
+    </div>
+
+    <!-- 帖子流容器（JS 动态渲染） -->
+    <div class="post-grid" id="postGrid">
+      <!-- loading 占位 -->
+      <div class="empty-state">
+        <div class="empty-state__icon">···</div>
+        <p class="empty-state__text">正在听海浪的声音…</p>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- 页脚 -->
+  <footer class="community-footer">
+    <p>躺岛 TANGDAO · 陵水慢生活地图</p>
+    <p class="community-footer__sub">Demos only · 社区内容均为示意</p>
+  </footer>
+
+  <!-- JS 绝对路径 -->
+  <script src="/js/community.js"></script>
+</body>
+</html>

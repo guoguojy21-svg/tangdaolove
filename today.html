@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>今天去哪？ · 躺岛 TANGDAO</title>
+  <meta name="description" content="今天的你，捡到哪一枚贝壳？陵水慢生活今日拾贝。" />
+  <link rel="icon" type="image/svg+xml" href="/assets/favicon.svg" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,400&family=Jost:wght@300;400;500&family=Ma+Shan+Zheng&family=Noto+Serif+SC:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <!-- 独立样式系统，不引用首页 style.css 避免污染 -->
+  <link rel="stylesheet" href="/css/today.css?v=3" />
+  <link rel="stylesheet" href="/css/post-snippets.css" />
+  <style>body { background: #F7F3EF; }</style>
+</head>
+<body class="today-page" style="background:#F7F3EF;">
+
+  <div class="today-container">
+    <!-- 顶部品牌条 -->
+    <header class="today-topbar">
+      <a href="/index.html" class="today-topbar__brand">
+        躺岛 TANGDAO
+        <em>Lingshui Slow Living</em>
+      </a>
+      <a href="/map.html" class="today-topbar__back">← 返回地图</a>
+    </header>
+
+    <!-- 装饰：页面角落（每屏不超过 3-5 个） -->
+    <div class="deco" style="top: 4%; right: 6%; width: 54px; height: 54px;" aria-hidden="true">
+      <!-- 海螺 -->
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><path d="M12 3c-4 0-7 3-7 7 0 3 2 5 4 6l-1 3h8l-1-3c2-1 4-3 4-6 0-4-3-7-7-7z"/><path d="M12 7c-2 0-3 1.5-3 3 0 1 .5 2 1.5 2.5"/></svg>
+    </div>
+    <div class="deco deco--sea" style="bottom: 6%; left: 5%; width: 46px; height: 46px;" aria-hidden="true">
+      <!-- 海星 -->
+      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l2.5 6.5L21 9l-5 4.5L17.5 21 12 17l-5.5 4L8 13.5 3 9l6.5-.5z"/></svg>
+    </div>
+  </div>
+
+  <!-- 主舞台：四态切换 -->
+  <main class="today-stage" id="todayStage">
+
+    <!-- 1. INTRO 开场 -->
+    <section class="page-state intro" data-state="intro" data-active="true">
+      <div class="quiz-width intro__inner">
+        <div class="intro__layout">
+          <!-- 左侧：视觉氛围区（桌面端显示） -->
+          <div class="intro__visual" aria-hidden="true">
+            <!-- 装饰：水面光纹（贝壳后） -->
+            <div class="intro__ripples">
+              <span></span><span></span><span></span>
+            </div>
+            <!-- 中央粉白贝壳 -->
+            <div class="intro__shell">
+              <svg viewBox="0 0 120 120" fill="none">
+                <defs>
+                  <linearGradient id="shellGrad" x1="0" y1="0" x2="1" y2="1">
+                    <stop offset="0%" stop-color="#F7F3EF"/>
+                    <stop offset="50%" stop-color="#F0DADA"/>
+                    <stop offset="100%" stop-color="#E7BBB9"/>
+                  </linearGradient>
+                </defs>
+                <path d="M60 12C36 12 18 30 18 54c0 14 8 26 20 33l5 4h34l5-4c12-7 20-19 20-33C102 30 84 12 60 12z" fill="url(#shellGrad)" stroke="#DFA69F" stroke-width="1.5"/>
+                <path d="M60 20v66M60 28C48 30 38 36 31 47M60 28c12 2 22 8 29 19M60 42c-9 2-17 8-22 16M60 42c9 2 17 8 22 16M60 56c-7 2-13 6-17 12M60 56c7 2 13 6 17 12" stroke="#DFA69F" stroke-width="1" opacity="0.7"/>
+              </svg>
+            </div>
+            <!-- 小海星 -->
+            <div class="intro__deco-star">
+              <svg viewBox="0 0 24 24" fill="#9CCECE"><path d="M12 2l2.5 6.5L21 9l-5 4.5L17.5 21 12 17l-5.5 4L8 13.5 3 9l6.5-.5z"/></svg>
+            </div>
+            <!-- 花瓣 -->
+            <div class="intro__deco-petal">
+              <svg viewBox="0 0 24 24" fill="#E7BBB9"><path d="M12 2c3 4 4 8 0 12-4-4-3-8 0-12z" opacity="0.8"/></svg>
+            </div>
+            <!-- 装饰：白沙 + 小珍珠 + 太阳高光 -->
+            <div class="intro__visual-sand"></div>
+            <span class="intro__visual-pearl intro__visual-pearl--1"></span>
+            <span class="intro__visual-pearl intro__visual-pearl--2"></span>
+            <div class="intro__visual-sun"></div>
+          </div>
+
+          <!-- 右侧：文字 + CTA -->
+          <div class="intro__content">
+            <p class="intro__eyebrow">Today's Shell · 今日拾贝</p>
+            <h1 class="intro__title handwrite">今天想怎么躺？</h1>
+            <p class="intro__lead">回答今天的状态，<br/>替你从陵水捡一枚属于今天的贝壳。</p>
+            <button class="btn-shell btn-shell--pearl" data-action="start">
+              捡一枚今天的贝壳
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 2. QUIZ 问题 -->
+    <section class="page-state quiz" data-state="quiz">
+      <div class="quiz-stage" id="quizStage">
+        <div class="quiz__layout">
+          <!-- 左侧视觉区（桌面端显示，按题型切换氛围） -->
+          <aside class="quiz__visual" aria-hidden="true">
+            <!-- energy：阳光 + 贝壳 -->
+            <div class="qv-scene qv-scene--energy">
+              <div class="qv-sun"></div>
+              <div class="qv-shell qv-shell--lg"></div>
+              <div class="qv-shell qv-shell--sm"></div>
+            </div>
+            <!-- crowd：不同数量小贝壳 -->
+            <div class="qv-scene qv-scene--crowd">
+              <div class="qv-shell-row">
+                <span></span><span></span><span></span><span></span>
+              </div>
+            </div>
+            <!-- sun：水面高光 -->
+            <div class="qv-scene qv-scene--sun">
+              <div class="qv-water-surface"></div>
+            </div>
+            <!-- activity：海浪 / 海星 -->
+            <div class="qv-scene qv-scene--activity">
+              <div class="qv-wave"></div>
+              <div class="qv-wave qv-wave--2"></div>
+              <div class="qv-starfish">
+                <svg viewBox="0 0 24 24" fill="#9CCECE"><path d="M12 2l2.5 6.5L21 9l-5 4.5L17.5 21 12 17l-5.5 4L8 13.5 3 9l6.5-.5z"/></svg>
+              </div>
+            </div>
+            <!-- companion：两枚或多枚贝壳组合 -->
+            <div class="qv-scene qv-scene--companion">
+              <div class="qv-shell qv-shell--lg"></div>
+              <div class="qv-shell qv-shell--lg qv-shell--offset"></div>
+            </div>
+            <!-- emotion：花朵 + 珍珠 + 贝母 -->
+            <div class="qv-scene qv-scene--emotion">
+              <div class="qv-flower">
+                <svg viewBox="0 0 24 24" fill="#E7BBB9"><path d="M12 2c3 4 4 8 0 12-4-4-3-8 0-12z" opacity="0.8"/></svg>
+              </div>
+              <div class="qv-pearl"></div>
+              <div class="qv-shell qv-shell--pearl"></div>
+            </div>
+          </aside>
+
+          <!-- 右侧：题目区 -->
+          <div class="quiz__main quiz-width">
+            <!-- 顶部轻量栏：返回 + 进度 -->
+            <div class="quiz__topbar">
+              <button class="quiz__back" data-action="back" aria-label="返回">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M15 18l-6-6 6-6"/></svg>
+                <span>返回</span>
+              </button>
+              <div class="quiz__progress">
+                <span class="quiz__progress-text" id="quizProgressText">01 / 06</span>
+                <div class="quiz__progress-bar"><div class="quiz__progress-fill" id="quizProgress"></div></div>
+              </div>
+            </div>
+
+            <div class="quiz__body">
+              <h2 class="quiz__question handwrite" id="quizQuestion">今天还有多少电？</h2>
+              <div class="quiz__options" id="quizOptions">
+                <!-- 选项由 JS 动态渲染 -->
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 3. LOADING 生成动画：水退 → 沙现 → 贝壳显露 → 文字 -->
+    <section class="page-state loading" data-state="loading" id="loadingSection">
+      <!-- 背景层：暖白渐变淡入 -->
+      <div class="loading__bg" aria-hidden="true"></div>
+
+      <!-- 水纹层：浅海水流过再渐退 -->
+      <div class="loading__water" aria-hidden="true">
+        <div class="loading__water-surface"></div>
+      </div>
+
+      <!-- 沙面层：极浅沙纹渐显 -->
+      <div class="loading__sand" aria-hidden="true">
+        <span class="loading__grain loading__grain--1"></span>
+        <span class="loading__grain loading__grain--2"></span>
+        <span class="loading__grain loading__grain--3"></span>
+      </div>
+
+      <!-- 小装饰：海星 + 漂落花瓣 -->
+      <div class="loading__deco" aria-hidden="true">
+        <span class="loading__starfish">
+          <svg viewBox="0 0 24 24" fill="#9CCECE"><path d="M12 2l2.5 6.5L21 9l-5 4.5L17.5 21 12 17l-5.5 4L8 13.5 3 9l6.5-.5z"/></svg>
+        </span>
+        <span class="loading__petal">
+          <svg viewBox="0 0 24 24" fill="#E7BBB9"><path d="M12 2c3 4 4 8 0 12-4-4-3-8 0-12z" opacity="0.8"/></svg>
+        </span>
+      </div>
+
+      <!-- 贝壳显露层 -->
+      <div class="loading__shell-wrap">
+        <div class="loading__shell-glow"></div>
+        <svg class="loading__shell" id="loadingShell" viewBox="0 0 120 120" fill="none">
+          <defs>
+            <linearGradient id="loadingShellGrad" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0%" stop-color="#F7F3EF"/>
+              <stop offset="55%" stop-color="#F0DADA"/>
+              <stop offset="100%" stop-color="#E7BBB9"/>
+            </linearGradient>
+          </defs>
+          <path d="M60 14C37 14 20 31 20 54c0 13 8 24 19 31l5 4h32l5-4c11-7 19-18 19-31 0-23-17-40-40-40z"
+                fill="url(#loadingShellGrad)" stroke="#DFA69F" stroke-width="1.5"/>
+          <path d="M60 22v60M60 30C49 32 40 37 33 47M60 30c11 2 20 7 27 17M60 44c-8 2-16 7-21 15M60 44c8 2 16 7 21 15M60 58c-6 2-12 6-16 11M60 58c6 2 12 6 16 11"
+                stroke="#DFA69F" stroke-width="1" opacity="0.65"/>
+          <!-- 珠光高光 -->
+          <ellipse class="loading__shell-shine" cx="48" cy="42" rx="10" ry="16" fill="#fff" opacity="0"/>
+        </svg>
+      </div>
+
+      <!-- 文字层 -->
+      <div class="loading__text-wrap">
+        <p class="loading__text-main handwrite">捡到了。</p>
+        <p class="loading__text-sub">你今天捡到的是……</p>
+      </div>
+    </section>
+
+    <!-- 4. RESULT 结果页：纵向旅行手账式三区块 -->
+    <section class="page-state result" data-state="result">
+      <div class="result__scroll">
+        <div class="result__layout">
+
+          <!-- 左栏：贝壳角色标本 -->
+          <div class="result__col result__col--left">
+            <section class="result__block result__block--role">
+              <p class="result__eyebrow">FOUND IN LINGSHUI · 陵水拾贝</p>
+              <div class="result__card" id="resultCard">
+                <span class="result__role-number" id="resultRoleNumber">01</span>
+                <svg class="result__shell-icon" id="resultShellIcon" viewBox="0 0 100 100" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M50 8C30 8 14 22 14 42c0 12 6 22 16 28l4 4h32l4-4c10-6 16-16 16-28C86 22 70 8 50 8z"/>
+                  <path d="M50 14v58M50 22C40 24 30 30 24 40M50 22c10 2 20 8 26 18M50 34c-8 2-15 7-19 14M50 34c8 2 15 7 19 14"/>
+                </svg>
+                <p class="result__pick">你今天捡到的是</p>
+                <h3 class="result__role handwrite" id="resultRoleName">月光贝</h3>
+                <p class="result__role-en" id="resultRoleEn">MOON SHELL</p>
+                <p class="result__quote" id="resultRoleQuote">今天别赶路。</p>
+                <p class="result__desc" id="resultRoleDesc">今天的你更需要安静、树荫和一点风。</p>
+                <div class="result__tags" id="resultTags"></div>
+              </div>
+            </section>
+          </div>
+
+          <!-- 右栏：TOP3 推荐 + 分享入口 + 操作 -->
+          <div class="result__col result__col--right">
+            <!-- TOP3 明信片 -->
+            <section class="result__block result__block--top3">
+              <p class="result__section-label">TODAY IN LINGSHUI</p>
+              <h3 class="result__section-title">为你捡了 3 个今天适合去的地方</h3>
+              <p class="result__suggest" id="resultSuggest">基于你今天的状态，为你从陵水挑了 3 个去处 ↓</p>
+              <div class="result__top3" id="resultTop3">
+                <!-- 明信片由 JS 动态渲染 -->
+              </div>
+            </section>
+
+            <!-- 分享卡入口（占位，本阶段不做分享图生成） -->
+            <section class="result__block result__block--share">
+              <div class="result__share-entry">
+                <svg class="result__share-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4">
+                  <rect x="3" y="3" width="18" height="18" rx="2"/>
+                  <circle cx="8.5" cy="8.5" r="1.5"/>
+                  <path d="M21 15l-5-5L5 21"/>
+                </svg>
+                <div>
+                  <p class="result__share-title">把今天的贝壳寄给朋友</p>
+                  <p class="result__share-sub">分享卡功能即将开放</p>
+                </div>
+              </div>
+            </section>
+
+            <!-- 底部操作 -->
+            <div class="result__actions">
+              <button class="btn-shell btn-primary" data-action="save" id="btnSaveCard">保存今天的贝壳</button>
+              <button class="btn-shell btn-ghost" data-action="restart">再捡一次</button>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Dev 状态切换器（仅开发模式） -->
+  <div class="dev-switcher" role="group" aria-label="开发模式状态切换">
+    <span class="dev-switcher__label">DEV</span>
+    <button data-goto="intro" title="Intro (1)">1</button>
+    <button data-goto="quiz" title="Quiz (2)">2</button>
+    <button data-goto="loading" title="Loading (3)">3</button>
+    <button data-goto="result" title="Result (4)">4</button>
+  </div>
+
+  <!-- Dev 角色测试按钮：快速模拟 6 种答案命中对应角色 -->
+  <div class="dev-roles" role="group" aria-label="角色测试预设">
+    <span class="dev-roles__label">角色测试</span>
+    <button data-preset="preset-moon">月光贝</button>
+    <button data-preset="preset-blossom">樱花贝</button>
+    <button data-preset="preset-iridescent">虹彩贝</button>
+    <button data-preset="preset-pearl">珍珠蚌</button>
+    <button data-preset="preset-conch">海螺</button>
+    <button data-preset="preset-sun">太阳贝</button>
+  </div>
+
+  <!-- ============ 隐藏分享卡（1080×1440，供 html-to-image 导出 PNG） ============ -->
+  <div class="share-card-wrap" aria-hidden="true">
+    <div class="share-card" id="shareCard">
+      <!-- 背景材质层：贝母白 + 沙粒 + 珠光 + 装饰元素 -->
+      <div class="share-card__bg"></div>
+      <div class="share-card__decor">
+        <span class="decor decor--shell-1"></span>
+        <span class="decor decor--shell-2"></span>
+        <span class="decor decor--starfish"></span>
+        <span class="decor decor--petal-1"></span>
+        <span class="decor decor--petal-2"></span>
+        <span class="decor decor--wave"></span>
+      </div>
+
+      <div class="share-card__content">
+        <!-- 顶部标识 -->
+        <header class="share-card__header">
+          <p class="share-card__eyebrow" id="shareCardNumber">TANGDAO SHELL 05</p>
+          <p class="share-card__sub">FOUND IN LINGSHUI</p>
+        </header>
+
+        <!-- 贝壳视觉（视觉中心） -->
+        <div class="share-card__visual" id="shareCardVisual"></div>
+
+        <!-- 角色信息 -->
+        <div class="share-card__role">
+          <h2 class="share-card__role-name" id="shareCardRoleName">月 光 贝</h2>
+          <p class="share-card__role-en" id="shareCardRoleEn">MOON SHELL</p>
+          <p class="share-card__quote" id="shareCardQuote">今天别赶路。</p>
+          <p class="share-card__tags" id="shareCardTags">低电量 · 喜欢安静 · 一个人也很好</p>
+        </div>
+
+        <!-- 分隔 + TOP3 推荐 -->
+        <section class="share-card__top3">
+          <p class="share-card__section-label">TODAY IN LINGSHUI</p>
+          <div class="share-card__top3-list" id="shareCardTop3"></div>
+        </section>
+
+        <!-- 底部日期 / 天气 / 品牌 -->
+        <footer class="share-card__footer">
+          <div class="share-card__date-row">
+            <p class="share-card__date" id="shareCardDate">30 AUG 2026</p>
+            <p class="share-card__loc">LINGSHUI</p>
+            <p class="share-card__weather" id="shareCardWeather"></p>
+          </div>
+          <div class="share-card__brand">
+            <p class="share-card__brand-cn">躺岛 TANGDAO</p>
+            <p class="share-card__brand-en">陵水慢生活地图</p>
+            <p class="share-card__cta">你今天捡到什么贝？</p>
+          </div>
+        </footer>
+      </div>
+    </div>
+  </div>
+
+  <!-- 角色配置 + 贝壳视觉 + POI 推荐引擎（必须在 today.js 之前加载） -->
+  <script src="/js/config.js?v=5"></script>
+  <script src="/js/shellRoles.js?v=5"></script>
+  <script src="/js/shellVisuals.js?v=5"></script>
+  <script src="/js/poiRecommender.js?v=5"></script>
+  <!-- html-to-image：稳定的 DOM → PNG 导出库 -->
+  <script src="https://cdn.jsdelivr.net/npm/html-to-image@1.11.11/dist/html-to-image.min.js"></script>
+  <script src="/js/collection-store.js"></script>
+  <script src="/js/post-by-place.js"></script>
+  <script src="/js/today.js?v=5"></script>
+</body>
+</html>

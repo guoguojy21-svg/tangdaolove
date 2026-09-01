@@ -1,0 +1,88 @@
+{
+  "updatedAt": "2026-08-30T14:20:00+08:00",
+  "places": [
+    {
+      "placeId": 1,
+      "todayTimeline": [
+        {
+          "time": "06:30",
+          "event": "日出退潮",
+          "desc": "浅滩露出，适合赶海捡贝壳",
+          "status": "past"
+        },
+        {
+          "time": "11:00",
+          "event": "阳光最盛",
+          "desc": "海面反光最强，适合拍照",
+          "status": "past"
+        },
+        {
+          "time": "14:00–16:00",
+          "event": "手作市集",
+          "desc": "渔排旁的临时小摊，手作贝壳饰品",
+          "status": "current"
+        },
+        {
+          "time": "17:42",
+          "event": "Sunset",
+          "desc": "日落时刻，天空转粉",
+          "status": "future"
+        },
+        {
+          "time": "19:00",
+          "event": "Light Show",
+          "desc": "海边灯光轻秀，持续约 20 分钟",
+          "status": "future"
+        }
+      ],
+      "weekEvents": [
+        {
+          "dateRange": "8.25–9.03",
+          "dayLabel": "展览中",
+          "name": "摄影展·海的另一面",
+          "location": "赤岭渔村文化空间"
+        },
+        {
+          "dateRange": "SAT",
+          "dayLabel": "本周六",
+          "name": "Weekend Market",
+          "location": "新村港渔排广场"
+        },
+        {
+          "dateRange": "09.02",
+          "dayLabel": "下周",
+          "name": "冲浪体验课",
+          "location": "香水湾"
+        },
+        {
+          "dateRange": "09.08",
+          "dayLabel": "即将到来",
+          "name": "疍家渔排开放日",
+          "location": "新村港"
+        }
+      ],
+      "recentChanges": [
+        {
+          "tag": "NEW",
+          "text": "观海平台东侧新开放了一片区域",
+          "metric": null
+        },
+        {
+          "tag": "NOTICE",
+          "text": "东入口维修中，请从西门进入",
+          "metric": null
+        },
+        {
+          "tag": "HOT",
+          "text": "最近讨论量上涨",
+          "metric": "+132%"
+        },
+        {
+          "tag": "NEW",
+          "text": "新开了一家海上咖啡，就在渔排尽头",
+          "metric": null
+        }
+      ]
+    }
+  ]
+}
